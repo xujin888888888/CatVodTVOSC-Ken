@@ -45,6 +45,6 @@ dependencies {
     api "com.google.android.exoplayer:exoplayer-rtsp:2.18.1"
     api "com.google.android.exoplayer:extension-rtmp:2.18.1"
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation files('libs\\exo-extension-ffmpeg.aar', 'libs\\exo-extension-okhttp.aar')
+    implementation files('libs\\exo-extension-ffmpeg.aar')
     api 'xyz.doikki.android.dkplayer:dkplayer-ui:3.3.5'
 }
