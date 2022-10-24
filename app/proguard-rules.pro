@@ -217,3 +217,11 @@
 }
 
 -keep class com.github.catvod.crawler.*{*;}
+-keep public class com.undcover.freedom.pyramid.** { *; }
+-dontwarn com.undcover.freedom.pyramid.**
+-keep public class com.chaquo.python.** { *; }
+-dontwarn com.chaquo.python.**
+# quickjs引擎
+-keep class com.github.tvbox.quickjs.** {*;}
+# 支持影视的ali相关的jar
+-keep class com.google.gson.**{*;}
