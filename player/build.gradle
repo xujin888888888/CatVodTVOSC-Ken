@@ -37,7 +37,6 @@ android {
 }
 
 dependencies {
-    compileOnly fileTree(dir: "../app/libs", include: ["*.aar"])
     implementation "androidx.multidex:multidex:2.0.1"
     implementation "androidx.annotation:annotation:1.3.0"
     api "com.google.android.exoplayer:exoplayer-core:2.18.1"
