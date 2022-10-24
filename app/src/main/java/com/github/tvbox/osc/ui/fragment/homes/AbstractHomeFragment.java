@@ -139,7 +139,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
         public void run() {
             Date date = new Date();
             @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy年MM月dd日,EE hh:mm aa");
             if(tvDate != null)
                 tvDate.setText(timeFormat.format(date));
             mHandler.postDelayed(this, 1000);
