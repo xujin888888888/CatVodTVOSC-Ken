@@ -87,7 +87,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.android.material:material:1.4.0'
-    implementation files('libs\\thunder.jar', 'libs\\xwalk_shared_library-23.53.589.4.aar','libs\\exo-extension-ffmpeg.aar', 'libs\\exo-extension-okhttp.aar')
+    implementation files('libs\\thunder.jar', 'libs\\xwalk_shared_library-23.53.589.4.aar','libs\\pyramid.aar','libs\\exo-extension-ffmpeg.aar', 'libs\\exo-extension-okhttp.aar')
 
     annotationProcessor 'androidx.room:room-compiler:2.3.0'
     implementation 'androidx.room:room-runtime:2.3.0'
