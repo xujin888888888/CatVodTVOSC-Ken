@@ -74,7 +74,7 @@ android {
 }
 
 dependencies {
-    api fileTree(dir: "libs", include: ["*.jar"])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation ('com.github.thegrizzlylabs:sardine-android:0.5') {
         exclude group: 'com.squareup.okhttp3'
