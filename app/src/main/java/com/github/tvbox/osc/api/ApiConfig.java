@@ -17,10 +17,12 @@ import com.github.tvbox.osc.bean.ParseBean;
 import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.util.AdBlocker;
+import com.github.tvbox.osc.util.ConfigUtil;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.MD5;
+import com.github.tvbox.osc.util.PlayerHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -38,6 +40,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -99,16 +102,30 @@ public class ApiConfig {
             }
         }
         String apiFix = apiUrl;
+        String mySecretKey = "";
         if (apiUrl.startsWith("clan://")) {
             apiFix = clanToAddress(apiUrl);
+        } else {
+            //get link and password
+            String[] myConfigLinkToArr = apiUrl.split(";");
+            if (myConfigLinkToArr.length == 3) {
+                mySecretKey = myConfigLinkToArr[2];
+                apiFix = myConfigLinkToArr[0];
+            }
         }
+        String finalMySecretKey = mySecretKey;
+        String finalApiUrl = apiFix;
         OkGo.<String>get(apiFix)
+                .tag("loadApi")
                 .execute(new AbsCallback<String>() {
                     @Override
                     public void onSuccess(Response<String> response) {
                         try {
                             String json = response.body();
-                            parseJson(apiUrl, response.body());
+                            //decode and decrypt
+                            json = ConfigUtil.decodeConfig(finalMySecretKey, json);
+
+                            parseJson(finalApiUrl, json);
                             try {
                                 File cacheDir = cache.getParentFile();
                                 if (!cacheDir.exists())
@@ -134,7 +151,7 @@ public class ApiConfig {
                         super.onError(response);
                         if (cache.exists()) {
                             try {
-                                parseJson(apiUrl, cache);
+                                parseJson(finalApiUrl, cache);
                                 callback.success();
                                 return;
                             } catch (Throwable th) {
@@ -151,8 +168,8 @@ public class ApiConfig {
                         } else {
                             result = response.body().string();
                         }
-                        if (apiUrl.startsWith("clan")) {
-                            result = clanContentFix(clanToAddress(apiUrl), result);
+                        if (finalApiUrl.startsWith("clan")) {
+                            result = clanContentFix(clanToAddress(finalApiUrl), result);
                         }
                         //假相對路徑
                         result = fixContentPath(apiUrl,result);
@@ -202,7 +219,8 @@ public class ApiConfig {
                 return;
             }
         }
-
+        boolean isJarInImg = jarUrl.startsWith("img+");
+        jarUrl = jarUrl.replace("img+", "");
         OkGo.<File>get(jarUrl).execute(new AbsCallback<File>() {
 
             @Override
@@ -213,7 +231,13 @@ public class ApiConfig {
                 if (cache.exists())
                     cache.delete();
                 FileOutputStream fos = new FileOutputStream(cache);
-                fos.write(response.body().bytes());
+                if(isJarInImg) {
+                    String respData = response.body().string();
+                    byte[] decodedSpider = ConfigUtil.decodeSpider(respData);
+                    fos.write(decodedSpider);
+                } else {
+                    fos.write(response.body().bytes());
+                }
                 fos.flush();
                 fos.close();
                 return cache;
@@ -275,12 +299,16 @@ public class ApiConfig {
         }
         // 远端站点源
         SourceBean firstSite = null;
+        List<Integer> availablePlayerTypes = Arrays.asList(PlayerHelper.getAvailableDefaultPlayerTypes());
         for (JsonElement opt : infoJson.get("sites").getAsJsonArray()) {
             JsonObject obj = (JsonObject) opt;
             SourceBean sb = new SourceBean();
             String siteKey = obj.get("key").getAsString().trim();
             sb.setKey(siteKey);
             sb.setName(obj.get("name").getAsString().trim());
+            int playerType = DefaultConfig.safeJsonInt(obj, "playerType", -1);
+            if((playerType >= 0 && availablePlayerTypes.contains(sb.getPlayerType())) || playerType == -1)
+            sb.setPlayerType(playerType);
             sb.setType(obj.get("type").getAsInt());
             sb.setApi(obj.get("api").getAsString().trim());
             sb.setSearchable(DefaultConfig.safeJsonInt(obj, "searchable", 1));
