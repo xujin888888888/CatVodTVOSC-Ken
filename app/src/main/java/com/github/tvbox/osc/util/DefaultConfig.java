@@ -110,19 +110,33 @@ public class DefaultConfig {
         return start > -1 ? fileName.substring(0, start) : fileName;
     }
 
-
-    private static final Pattern snifferMatch = Pattern.compile("http((?!http).){26,}?\\.(m3u8|mp4)\\?.*|http((?!http).){26,}\\.(m3u8|mp4)|http((?!http).){26,}?/m3u8\\?pt=m3u8.*|http((?!http).)*?default\\.ixigua\\.com/.*|http((?!http).)*?cdn-tos[^\\?]*|http((?!http).)*?/obj/tos[^\\?]*|http.*?/player/m3u8play\\.php\\?url=.*|http.*?/player/.*?[pP]lay\\.php\\?url=.*|http.*?/playlist/m3u8/\\?vid=.*|http.*?\\.php\\?type=m3u8&.*|http.*?/download.aspx\\?.*|http.*?/api/up_api.php\\?.*|https.*?\\.66yk\\.cn.*|http((?!http).)*?netease\\.com/file/.*");
-
+        private static final Pattern snifferMatch = Pattern.compile(
+            "http((?!http).){20,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)\\?.*|" +
+            "http((?!http).){20,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)|" +
+            "http((?!http).){20,}?/m3u8\\?pt=m3u8.*|" +
+            "http((?!http).)*?default\\.ixigua\\.com/.*|" +
+            "http((?!http).)*?dycdn-tos\\.pstatp[^\\?]*|" +
+            "http.*?/player/m3u8play\\.php\\?url=.*|" +
+            "http.*?/player/.*?[pP]lay\\.php\\?url=.*|" +
+            "http.*?/playlist/m3u8/\\?vid=.*|http.*?\\.php\\?type=m3u8&.*|" +
+            "http.*?/download.aspx\\?.*|" +
+            "http.*?/api/up_api.php\\?.*|" +
+            "https.*?\\.66yk\\.cn.*|" +
+            "http((?!http).)*?netease\\.com/file/.*"
+    );
     public static boolean isVideoFormat(String url) {
-        if (url.contains("=http") || url.contains("=https") || url.contains("=https%3a%2f") || url.contains("=http%3a%2f")) {
+        if (url.contains("=http") || url.contains(".html")) {
             return false;
         }
-        if (snifferMatch.matcher(url).find()) {
-            if (url.contains("cdn-tos") && (url.contains(".js") || url.contains(".css"))) {
-                return false;
-            }
-            return true;
+        Uri uri = Uri.parse(url);
+        String path = uri.getPath();
+        if (TextUtils.isEmpty(path)) {
+            return false;
         }
+        if (path.endsWith(".js") || path.endsWith(".css") || path.endsWith(".html")) {
+            return false;
+        }
+        if (snifferMatch.matcher(url).find()) return true;
         return false;
     }
 
