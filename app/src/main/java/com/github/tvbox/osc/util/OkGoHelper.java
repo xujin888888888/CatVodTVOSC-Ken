@@ -106,7 +106,17 @@ public class OkGoHelper {
         String dohUrl = getDohUrl(Hawk.get(HawkConfig.DOH_URL, 0));
         dnsOverHttps = new DnsOverHttps.Builder().client(dohClient).url(dohUrl.isEmpty() ? null : HttpUrl.get(dohUrl)).build();
     }
+    
+    static OkHttpClient defaultClient = null;
+    static OkHttpClient noRedirectClient = null;
 
+    public static OkHttpClient getDefaultClient() {
+        return defaultClient;
+    }
+
+    public static OkHttpClient getNoRedirectClient() {
+        return noRedirectClient;
+    }
     public static void init() {
         initDnsOverHttps();
 
