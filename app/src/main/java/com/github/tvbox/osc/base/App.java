@@ -10,9 +10,11 @@ import com.github.tvbox.osc.util.EpgUtil;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
+import com.github.tvbox.osc.util.js.JSEngine;
 import com.kingja.loadsir.core.LoadSir;
 import com.orhanobut.hawk.Hawk;
-
+import com.github.catvod.crawler.SpiderNull;
+import com.undcover.freedom.pyramid.PythonLoader;
 import me.jessyan.autosize.AutoSizeConfig;
 import me.jessyan.autosize.unit.Subunits;
 
@@ -31,6 +33,7 @@ public class App extends MultiDexApplication {
         initParams();
         // OKGo
         OkGoHelper.init();
+	EpgUtil.init();
         // 初始化Web服务器
         ControlManager.init(this);
         //初始化数据库
@@ -45,6 +48,10 @@ public class App extends MultiDexApplication {
                 .setSupportSubunits(Subunits.MM);
         PlayerHelper.init();
         EpgUtil.init();
+        JSEngine.getInstance().create();
+            //pyramid-add-start
+	PythonLoader.getInstance().setApplication(this);
+    //pyramid-add-end
     }
 
     private void initParams() {
@@ -58,5 +65,10 @@ public class App extends MultiDexApplication {
 
     public static App getInstance() {
         return instance;
+    }
+@Override
+    public void onTerminate() {
+        super.onTerminate();
+        JSEngine.getInstance().destroy();
     }
 }
