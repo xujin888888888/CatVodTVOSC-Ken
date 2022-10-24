@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-    api fileTree(dir: "libs", include: ["*.aar"])
+    implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation "androidx.multidex:multidex:2.0.1"
     implementation "androidx.annotation:annotation:1.3.0"
     api "com.google.android.exoplayer:exoplayer-core:2.18.1"
@@ -45,7 +45,7 @@ dependencies {
     api "com.google.android.exoplayer:exoplayer-hls:2.18.1"
     api "com.google.android.exoplayer:exoplayer-rtsp:2.18.1"
     api "com.google.android.exoplayer:extension-rtmp:2.18.1"
-    api 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation files('libs\\exo-extension-ffmpeg.aar', 'libs\\exo-extension-okhttp.aar')
     api 'xyz.doikki.android.dkplayer:dkplayer-ui:3.3.5'
 }
