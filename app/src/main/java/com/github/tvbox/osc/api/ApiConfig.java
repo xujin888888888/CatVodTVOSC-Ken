@@ -8,6 +8,7 @@ import android.util.Base64;
 import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
+import com.undcover.freedom.pyramid.PythonLoader;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.bean.LiveChannelGroup;
 import com.github.tvbox.osc.bean.IJKCode;
@@ -90,7 +91,6 @@ public class ApiConfig {
             callback.error("-1");
             return;
         }
-
         File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/" + MD5.encode(apiUrl));
         if (useCache && cache.exists()) {
             try {
@@ -171,6 +171,8 @@ public class ApiConfig {
                         if (finalApiUrl.startsWith("clan")) {
                             result = clanContentFix(clanToAddress(finalApiUrl), result);
                         }
+                        //假相對路徑
+                        result = fixContentPath(apiUrl,result);
                         return result;
                     }
                 });
@@ -217,7 +219,6 @@ public class ApiConfig {
                 return;
             }
         }
-
         boolean isJarInImg = jarUrl.startsWith("img+");
         jarUrl = jarUrl.replace("img+", "");
         OkGo.<File>get(jarUrl).execute(new AbsCallback<File>() {
@@ -279,6 +280,9 @@ public class ApiConfig {
     }
 
     private void parseJson(String apiUrl, String jsonStr) {
+        //pyramid-add-start
+        PythonLoader.getInstance().setConfig(jsonStr);
+        //pyramid-add-end
         JsonObject infoJson = new Gson().fromJson(jsonStr, JsonObject.class);
         // spider
         String spider = DefaultConfig.safeJsonString(infoJson, "spider", null);
@@ -302,10 +306,10 @@ public class ApiConfig {
             String siteKey = obj.get("key").getAsString().trim();
             sb.setKey(siteKey);
             sb.setName(obj.get("name").getAsString().trim());
-            sb.setType(obj.get("type").getAsInt());
             int playerType = DefaultConfig.safeJsonInt(obj, "playerType", -1);
             if((playerType >= 0 && availablePlayerTypes.contains(sb.getPlayerType())) || playerType == -1)
-                sb.setPlayerType(playerType);
+            sb.setPlayerType(playerType);
+            sb.setType(obj.get("type").getAsInt());
             sb.setApi(obj.get("api").getAsString().trim());
             sb.setSearchable(DefaultConfig.safeJsonInt(obj, "searchable", 1));
             sb.setQuickSearch(DefaultConfig.safeJsonInt(obj, "quickSearch", 1));
@@ -313,9 +317,9 @@ public class ApiConfig {
             sb.setPlayerUrl(DefaultConfig.safeJsonString(obj, "playUrl", ""));
             sb.setExt(DefaultConfig.safeJsonString(obj, "ext", ""));
             sb.setCategories(DefaultConfig.safeJsonStringList(obj, "categories"));
-            sb.setSpider(DefaultConfig.safeJsonString(obj, "spider", null));
+            sb.setSpider(DefaultConfig.safeJsonString(obj, "jar", null));
             if(obj.has("jar"))
-                sb.setSpider(DefaultConfig.safeJsonString(obj, "jar", null));
+                sb.setSpider(DefaultConfig.safeJsonString(obj, "spider", null));
             String spiderKey = sb.getSpider();
             if(spiderKey.startsWith("http") || spiderKey.startsWith("clan")) {
                 spiderKey = MD5.string2MD5(spiderKey);
@@ -475,13 +479,39 @@ public class ApiConfig {
     }
 
     public Spider getCSP(SourceBean sourceBean) {
-        if(jarLoaders.containsKey(sourceBean.getSpider()))
+            //pyramid-add-start
+    if (sourceBean.getApi().startsWith("py_")) {
+        try {
+            return PythonLoader.getInstance().getSpider(sourceBean.getKey(), sourceBean.getExt());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new SpiderNull();
+        }
+    }
+    //pyramid-add-end
+            if(jarLoaders.containsKey(sourceBean.getSpider()))
             return jarLoaders.get(sourceBean.getSpider()).getSpider(sourceBean.getKey(), sourceBean.getApi(), sourceBean.getExt());
         else
             return new SpiderNull();
     }
 
     public Object[] proxyLocal(Map param) {
+            //pyramid-add-start
+    try {
+        if(param.containsKey("api")){
+            String doStr = param.get("do").toString();
+            if(doStr.equals("ck"))
+                return PythonLoader.getInstance().proxyLocal("","",param);
+            SourceBean sourceBean = ApiConfig.get().getSource(doStr);
+            return PythonLoader.getInstance().proxyLocal(sourceBean.getKey(),sourceBean.getExt(),param);
+        }else{
+            String doStr = param.get("do").toString();
+            if(doStr.equals("live")) return PythonLoader.getInstance().proxyLocal("","",param);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    //pyramid-add-end
         return getHomeJarLoader().proxyInvoke(param);
     }
 
@@ -592,5 +622,14 @@ public class ApiConfig {
     String clanContentFix(String lanLink, String content) {
         String fix = lanLink.substring(0, lanLink.indexOf("/file/") + 6);
         return content.replace("clan://", fix);
+    }
+    String fixContentPath(String url, String content) {
+        if (content.contains("\"./")) {
+            if(!url.startsWith("http")){
+                url = "http://" + url;
+            }
+            content = content.replace("./", url.substring(0,url.lastIndexOf("/") + 1));
+        }
+        return content;
     }
 }
