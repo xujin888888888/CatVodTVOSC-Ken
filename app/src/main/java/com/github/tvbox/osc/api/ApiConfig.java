@@ -134,6 +134,8 @@ public class ApiConfig {
                 th.printStackTrace();
             }
         }
+        String apiFix = apiUrl;
+        String mySecretKey = "";
         String TempKey = null, configUrl = "", pk = ";pk;";
         if (apiUrl.contains(pk)) {
             String[] a = apiUrl.split(pk);
@@ -153,6 +155,8 @@ public class ApiConfig {
             configUrl = apiUrl;
         }
         String configKey = TempKey;
+        String finalMySecretKey = mySecretKey;
+        String finalApiUrl = apiFix;
         OkGo.<String>get(configUrl)
                 .tag("loadApi")
                 .execute(new AbsCallback<String>() {
