@@ -3,8 +3,10 @@ package com.github.catvod.crawler;
 import android.content.Context;
 
 import com.github.tvbox.osc.base.App;
-import com.github.tvbox.osc.util.js.SpiderJS;
+
 import org.json.JSONObject;
+
+import com.github.tvbox.osc.util.js.SpiderJS;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -71,7 +73,7 @@ public class JarLoader {
     }
 
     public Spider getSpider(String key, String cls, String ext) {
-            if (cls.toLowerCase().endsWith(".js") || cls.toLowerCase().contains(".js?")) {
+    if (cls.toLowerCase().endsWith(".js")) {
             if (spiders.containsKey(key))
                 return spiders.get(key);
             try {
