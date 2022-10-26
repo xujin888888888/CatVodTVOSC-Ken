@@ -164,7 +164,7 @@ public class RecommendActivity extends BaseActivity {
                     if (ApiConfig.get().getSourceBeanList().isEmpty())
                         return;
                     String title = ((Movie.Video) adapter.getItem(position)).name;
-                    Intent newIntent = new Intent(mContext, SearchActivity.class);
+                    Intent newIntent = new Intent(mContext, FastSearchActivity.class);
                     newIntent.putExtra("title", title);
                     newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(newIntent);
