@@ -32,7 +32,6 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DiffUtil;
-
 import com.github.catvod.crawler.Spider;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
@@ -42,9 +41,9 @@ import com.github.tvbox.osc.bean.SourceBean;
 import com.github.tvbox.osc.bean.VodInfo;
 import com.github.tvbox.osc.cache.CacheManager;
 import com.github.tvbox.osc.event.RefreshEvent;
-import com.github.tvbox.osc.player.IjkMediaPlayer;
 import com.github.tvbox.osc.player.controller.VodController;
 import com.github.tvbox.osc.player.thirdparty.DangbeiPlayer;
+import com.github.tvbox.osc.player.IjkMediaPlayer;
 import com.github.tvbox.osc.player.thirdparty.MXPlayer;
 import com.github.tvbox.osc.player.thirdparty.ReexPlayer;
 import com.github.tvbox.osc.player.thirdparty.UCPlayer;
@@ -218,21 +217,17 @@ public class PlayerFragment  extends BaseLazyFragment {
             }
 
             @Override
-            public void replay() {
+            public void replay(boolean replay) {
                 autoRetryCount = 0;
-                String progressKey = playingUrl; //mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
-                replayKey = progressKey;
-                if(mVideoView.getCurrentPlayState() != VideoView.STATE_ERROR)
-                    lastParseBean = null;
-                play();
+                play(replay);
             }
+            
 
             @Override
             public void errReplay() {
                 errorWithRetry("视频播放出错", false);
             }
-
-            @Override
+                @Override
             public void setAudioTrack() {
                 List<ITrackInfo> tracks = mVideoView.getTrackInfo(ITrackInfo.MEDIA_TRACK_TYPE_AUDIO);
                 if (tracks.size() <= 1) {
@@ -445,7 +440,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         this.sourceKey = sourceKey;
         sourceBean = ApiConfig.get().getSource(sourceKey);
         initPlayerCfg();
-        play();
+        play(false);
     }
 
     private VodInfo clonePlayingVodeInfo(VodInfo info) {
@@ -466,9 +461,9 @@ public class PlayerFragment  extends BaseLazyFragment {
         try {
             if (!mVodPlayerCfg.has("pl")) {
                 if(sourceBean != null && sourceBean.getPlayerType() > -1)
-                    mVodPlayerCfg.put("pl", sourceBean.getPlayerType());
+                mVodPlayerCfg.put("pl", sourceBean.getPlayerType());
                 else
-                    mVodPlayerCfg.put("pl", Hawk.get(HawkConfig.PLAY_TYPE, 1));
+                mVodPlayerCfg.put("pl", Hawk.get(HawkConfig.PLAY_TYPE, 1));
             }
             if (!mVodPlayerCfg.has("pr")) {
                 mVodPlayerCfg.put("pr", Hawk.get(HawkConfig.PLAY_RENDER, 0));
@@ -522,7 +517,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
         mVodInfo.playIndex++;
         playingInfo.playIndex++;
-        play();
+        play(false);
     }
 
     public void playPrevious() {
@@ -538,7 +533,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
         mVodInfo.playIndex--;
         playingInfo.playIndex--;
-        play();
+        play(false);
     }
 
     private int autoRetryCount = 0;
@@ -546,7 +541,7 @@ public class PlayerFragment  extends BaseLazyFragment {
     boolean autoRetry() {
         if (autoRetryCount < 3) {
             autoRetryCount++;
-            play();
+            play(false);
             return true;
         } else {
             autoRetryCount = 0;
@@ -554,7 +549,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
     }
 
-    public void play() {
+    public void play(boolean reset) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type", "vod-update-info");
         jsonObject.addProperty("playFlag", mVodInfo.playFlag);
@@ -592,7 +587,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         if (Thunder.play(vs.url, new Thunder.ThunderCallback() {
             @Override
             public void status(int code, String info) {
-                mActivity.runOnUiThread(new Runnable() {
+mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (code < 0) {
@@ -1198,9 +1193,9 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
 
         WebResourceResponse checkIsVideo(String url, HashMap<String, String> headers) {
-            if (url.endsWith("/favicon.ico")) {
-                return new WebResourceResponse("image/png", null, null);
-            }
+            //            if (url.endsWith("/favicon.ico")) {
+//                return new WebResourceResponse("image/png", null, null);
+//          }
             LOG.i("shouldInterceptRequest url:" + url);
             boolean ad;
             if (!loadedUrls.containsKey(url)) {
@@ -1370,9 +1365,9 @@ public class PlayerFragment  extends BaseLazyFragment {
         public XWalkWebResourceResponse shouldInterceptLoadRequest(XWalkView view, XWalkWebResourceRequest request) {
             String url = request.getUrl().toString();
             // suppress favicon requests as we don't display them anywhere
-            if (url.endsWith("/favicon.ico")) {
-                return createXWalkWebResourceResponse("image/png", null, null);
-            }
+            //            if (url.endsWith("/favicon.ico")) {
+//                return createXWalkWebResourceResponse("image/png", null, null);
+//            }
             LOG.i("shouldInterceptLoadRequest url:" + url);
             boolean ad;
             if (!loadedUrls.containsKey(url)) {
