@@ -1,8 +1,10 @@
 package com.github.tvbox.osc.player.controller;
-
+import static xyz.doikki.videoplayer.util.PlayerUtils.stringForTime;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -29,6 +31,7 @@ import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.google.gson.JsonObject;
+import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
@@ -36,7 +39,7 @@ import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -127,6 +130,7 @@ public class VodController extends BaseController {
     TextView mPlayerTimeSkipBtn;
     TextView mPlayerTimeStepBtn;
     TextView loadingSpeed;
+    TextView loadingSpeedRt;
     TextView tvVideoInfo;
     TextView finishAt;
     TextView btnHint;
@@ -134,22 +138,28 @@ public class VodController extends BaseController {
     ImageView lockerRight;
     ImageView tvBack;
     ImageView playAudio;
-
+    TextView mPlayerFFwd;
+    TextView mAudioTrackBtn;
+    float mSpeed;
+    Drawable dPlay = getResources().getDrawable(R.drawable.icon_vodcontroller_play);
+    Drawable dFFwd = getResources().getDrawable(R.drawable.play_ffwd);
     private boolean shouldShowBottom = true;
     private boolean shouldShowLoadingSpeed = Hawk.get(HawkConfig.DISPLAY_LOADING_SPEED, true);
+    private boolean shouldShowLoadingSpeedRt = Hawk.get(HawkConfig.DISPLAY_LOADING_SPEED, true);
     private Runnable mRunnable = new Runnable() {
         @SuppressLint({"DefaultLocale", "SetTextI18n"})
         @Override
         public void run() {
             Date date = new Date();
             @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
+            loadingSpeedRt.setText(PlayerHelper.getDisplaySpeed(mControlWrapper.getTcpSpeed()));
             tvDate.setText(timeFormat.format(date));
             if(mControlWrapper.getDuration() > 0) {
-                SimpleDateFormat onlyTimeFormat = new SimpleDateFormat("HH:mm");
+                SimpleDateFormat onlyTimeFormat = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
                 long remainTime = mControlWrapper.getDuration() - mControlWrapper.getCurrentPosition();
                 Date endTime = new Date(date.getTime() + remainTime);
-                finishAt.setText("本集完结于 " + onlyTimeFormat.format(endTime));
+                finishAt.setText("Ends at " + onlyTimeFormat.format(endTime));
             } else {
                 finishAt.setText("");
             }
@@ -187,6 +197,7 @@ public class VodController extends BaseController {
         mPlayerTimeSkipBtn = findViewById(R.id.play_time_end);
         mPlayerTimeStepBtn = findViewById(R.id.play_time_step);
         loadingSpeed = findViewById(R.id.loadingSpeed);
+        loadingSpeedRt = findViewById(R.id.loadingSpeedRt);
         tvVideoInfo = findViewById(R.id.tv_video_info);
         finishAt = findViewById(R.id.tv_finish_at);
         btnHint = findViewById(R.id.play_btn_hint);
@@ -194,7 +205,7 @@ public class VodController extends BaseController {
         lockerRight = findViewById(R.id.play_screen_lock_right);
         tvBack = findViewById(R.id.tv_back);
         playAudio = findViewById(R.id.play_audio);
-
+        mPlayerFFwd = findViewById(R.id.play_ff);
         mGridView.setLayoutManager(new V7LinearLayoutManager(getContext(), 0, false));
 
         parseAdapter = new ParseAdapter();
@@ -249,8 +260,16 @@ public class VodController extends BaseController {
         mPlayerRetry.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.replay();
+                listener.replay(true);
                 hideBottom();
+            }
+        });
+        mPlayerRetry.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                listener.replay(false);
+                hideBottom();
+                return true;
             }
         });
         mPlayPause.setOnClickListener(new OnClickListener() {
@@ -273,6 +292,7 @@ public class VodController extends BaseController {
                 hideBottom();
             }
         });
+        
         mPlayerScaleBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -290,6 +310,19 @@ public class VodController extends BaseController {
                 }
             }
         });
+                // takagen99 : Long Press to change orientation
+        mPlayerScaleBtn.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                int checkOrientation = mActivity.getRequestedOrientation();
+                if (checkOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+                    mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                } else if (checkOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
+                    mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                }
+                return true;
+            }
+        });
         mPlayerSpeedBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -298,6 +331,8 @@ public class VodController extends BaseController {
                     speed += 0.25f;
                     if (speed > 3)
                         speed = 0.5f;
+                    if (speed == 1)
+                        mPlayerFFwd.setCompoundDrawablesWithIntrinsicBounds(dFFwd, null, null, null);
                     mPlayerConfig.put("sp", speed);
                     updatePlayerCfgView();
                     listener.updatePlayerCfg();
@@ -305,6 +340,21 @@ public class VodController extends BaseController {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        mPlayerSpeedBtn.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                try {
+                    mPlayerFFwd.setCompoundDrawablesWithIntrinsicBounds(dFFwd, null, null, null);
+                    mPlayerConfig.put("sp", 1.0f);
+                    updatePlayerCfgView();
+                    listener.updatePlayerCfg();
+                    mControlWrapper.setSpeed(1.0f);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return true;
             }
         });
         mPlayerBtn.setOnClickListener(new OnClickListener() {
@@ -326,7 +376,7 @@ public class VodController extends BaseController {
                     mPlayerConfig.put("pl", playerType);
                     updatePlayerCfgView();
                     listener.updatePlayerCfg();
-                    listener.replay();
+                    listener.replay(false);
                     // hideBottom();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -352,7 +402,7 @@ public class VodController extends BaseController {
                     mPlayerConfig.put("ijk", ijk);
                     updatePlayerCfgView();
                     listener.updatePlayerCfg();
-                    listener.replay();
+                    listener.replay(false);
                     hideBottom();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -441,6 +491,28 @@ public class VodController extends BaseController {
                 return true;
             }
         });
+                mPlayerFFwd.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSpeed == 5.0f) {
+                    mSpeed = 1.0f;
+                    mPlayerFFwd.setCompoundDrawablesWithIntrinsicBounds(dFFwd, null, null, null);
+                } else {
+                    mSpeed = 5.0f;
+                    mPlayerFFwd.setCompoundDrawablesWithIntrinsicBounds(dPlay, null, null, null);
+                }
+                ;
+                try {
+                    mPlayerConfig.put("sp", mSpeed);
+                    updatePlayerCfgView();
+                    listener.updatePlayerCfg();
+                    mControlWrapper.setSpeed(mSpeed);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+                
 
         m3rdPlayerBtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -549,7 +621,7 @@ public class VodController extends BaseController {
         if(listener != null)
             listener.updatePlayerCfg();
         if(changedOption.equals("pl") || changedOption.equals("ijk"))
-            listener.replay();
+            listener.replay(false);
         if(changedOption.equals("sc")) {
             try {
                 mControlWrapper.setScreenScaleType(this.mPlayerConfig.getInt("sc"));
@@ -619,10 +691,10 @@ public class VodController extends BaseController {
 
         void updatePlayerCfg();
 
-        void replay();
+        void replay(boolean replay);
 
         void errReplay();
-
+        
         void setAudioTrack();
 
         void setSubtitleTrack();
@@ -800,7 +872,7 @@ public class VodController extends BaseController {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mNextBtn.requestFocus();
+                mPlayPause.requestFocus();
             }
         }, 300);
 
@@ -874,7 +946,7 @@ public class VodController extends BaseController {
             doShowHint(mPlayerTimeSkipBtn, "跳过片尾", postDelay);
         } else if(focusedView == mPlayerTimeStepBtn) {
             doShowHint(mPlayerTimeSkipBtn, "用于设置跳过片头/片尾的步速", postDelay);
-        } else if(focusedView == playAudio) {
+                    } else if(focusedView == playAudio) {
             doShowHint(playAudio, "选择音轨", postDelay);
         } else {
             mHandler.post(hideBtnHintRunnable);
@@ -886,6 +958,7 @@ public class VodController extends BaseController {
             @Override
             public void run() {
                 bringChildToFront(btnHint);
+                btnHint.clearAnimation();
                 btnHint.setText(hintText);
                 btnHint.setVisibility(VISIBLE);
                 btnHint.post(new Runnable() {
@@ -1077,6 +1150,10 @@ public class VodController extends BaseController {
 
     @Override
     public boolean onBackPressed() {
+    int checkOrientation = mActivity.getRequestedOrientation();
+        if (checkOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
+            mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        }
         if(isControllerLock) {
             toggleLockController();
             return true;
