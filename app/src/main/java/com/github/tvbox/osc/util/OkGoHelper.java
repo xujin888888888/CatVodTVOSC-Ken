@@ -148,6 +148,12 @@ public class OkGoHelper {
 
         OkHttpClient okHttpClient = builder.build();
         OkGo.getInstance().setOkHttpClient(okHttpClient);
+        
+        defaultClient = okHttpClient;
+
+        builder.followRedirects(false);
+        builder.followSslRedirects(false);
+        noRedirectClient = builder.build();
 
         initExoOkHttpClient();
         initPicasso(okHttpClient);
