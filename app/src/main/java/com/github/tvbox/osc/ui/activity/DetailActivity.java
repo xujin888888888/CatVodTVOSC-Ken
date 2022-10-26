@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.ClipboardManager;
+import android.content.ClipData;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -103,6 +105,7 @@ public class DetailActivity extends BaseActivity {
     private TextView tvType;
     private TextView tvActor;
     private TextView tvDirector;
+    private TextView tvPlayUrl;
     private TextView tvDes;
     private LinearLayout tvPlay;
     private LinearLayout tv3rdPlay;
@@ -169,6 +172,7 @@ public class DetailActivity extends BaseActivity {
         tvType = findViewById(R.id.tvType);
         tvActor = findViewById(R.id.tvActor);
         tvDirector = findViewById(R.id.tvDirector);
+        tvPlayUrl = findViewById(R.id.tvPlayUrl);
         tvDes = findViewById(R.id.tvDes);
         tvPlay = findViewById(R.id.tvPlay);
         tvSort = findViewById(R.id.tvSort);
@@ -222,11 +226,21 @@ public class DetailActivity extends BaseActivity {
                 }
             }
         });
-        tvPlay.setOnClickListener(new View.OnClickListener() {
+                tvPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
                 jumpToPlay(true, false, null);
+            }
+        });
+        tvPlayUrl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //获取剪切板管理器
+                ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                //设置内容到剪切板
+                cm.setPrimaryClip(ClipData.newPlainText(null, vodInfo.seriesMap.get(vodInfo.playFlag).get(0).url));
+                Toast.makeText(DetailActivity.this, "已复制", Toast.LENGTH_SHORT).show();
             }
         });
         tvQuickSearch.setOnClickListener(new View.OnClickListener() {
@@ -298,6 +312,8 @@ public class DetailActivity extends BaseActivity {
                     VodInfo.VodSeriesFlag flag = vodInfo.seriesFlags.get(position);
                     flag.selected = true;
                     vodInfo.playFlag = newFlag;
+                          //设置播放地址
+                    setTextShow(tvPlayUrl, "播放地址:", vodInfo.seriesMap.get(vodInfo.playFlag).get(0).url);
                     seriesFlagAdapter.notifyItemChanged(position);
                     refreshList();
                 }
@@ -673,8 +689,9 @@ public class DetailActivity extends BaseActivity {
                             } else
                                 flag.selected = false;
                         }
-
-                        seriesFlagAdapter.setNewData(vodInfo.seriesFlags);
+                                 //更新播放地址
+                    setTextShow(tvPlayUrl, "播放地址:", vodInfo.seriesMap.get(vodInfo.playFlag).get(0).url);
+                    seriesFlagAdapter.setNewData(vodInfo.seriesFlags);
                         mGridViewFlag.scrollToPosition(flagScrollTo);
 
                         refreshList();
@@ -964,8 +981,7 @@ public class DetailActivity extends BaseActivity {
     @Override
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void onUserLeaveHint() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerFragment != null &&
-                playerFragment.getVideoView().getCurrentPlayState() != VideoView.STATE_PAUSED) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerFragment != null && playerFragment.getVideoView().getCurrentPlayState() != VideoView.STATE_PAUSED) {
             try {
                 originalFullScreen = playerFragment.getVodController().isFullScreen();
                 playerFragment.getVodController().startFullScreen();
@@ -1060,9 +1076,9 @@ public class DetailActivity extends BaseActivity {
         AppManager.getInstance().finishActivity(this);
         Intent intent = new Intent(this,AppManager.getInstance().currentActivity().getClass());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//        Bundle bundle = new Bundle();
-//        bundle.putBoolean("useCache", true);
-//        jumpActivity(HomeActivity.class, bundle);
+        //        Bundle bundle = new Bundle();
+        //        bundle.putBoolean("useCache", true);
+        //        jumpActivity(HomeActivity.class, bundle);
         startActivity(intent);
         super.onBackPressed();
     }
