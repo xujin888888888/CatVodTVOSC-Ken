@@ -14,8 +14,11 @@ import okhttp3.Dns;
 public abstract class Spider {
 
     public static JSONObject empty = new JSONObject();
+    
+    protected static Context mContext;
 
     public void init(Context context) {
+    mContext = context;
     }
 
     public void init(Context context, String extend) {
