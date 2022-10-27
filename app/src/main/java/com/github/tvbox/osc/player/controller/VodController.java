@@ -199,7 +199,6 @@ public class VodController extends BaseController {
         lockerLeft = findViewById(R.id.play_screen_lock_left);
         lockerRight = findViewById(R.id.play_screen_lock_right);
         tvBack = findViewById(R.id.tv_back);
-        mSubtitleBtn = findViewById(R.id.play_subtitle);
         playAudio = findViewById(R.id.play_audio);
         mPlayerFFwd = findViewById(R.id.play_ff);
         mGridView.setLayoutManager(new V7LinearLayoutManager(getContext(), 0, false));
@@ -337,7 +336,7 @@ public class VodController extends BaseController {
                 }
             }
         });
-        mPlayerBtn.setOnClickListener(new OnClickListener() {
+            mPlayerSpeedBtn.setOnLongClickListener(new OnLongClickListener() {
         @Override
             public boolean onLongClick(View view) {
                 try {
