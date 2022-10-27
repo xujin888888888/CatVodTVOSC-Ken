@@ -73,13 +73,7 @@ public class App extends MultiDexApplication {
         JSEngine.getInstance().destroy();
     }
     
-        private VodInfo vodInfo;
-    public void setVodInfo(VodInfo vodinfo){
-        this.vodInfo = vodinfo;
-    }
-    public VodInfo getVodInfo(){
-        return this.vodInfo;
-    }
+        
 
     public Activity getCurrentActivity() {
         return AppManager.getInstance().currentActivity();
