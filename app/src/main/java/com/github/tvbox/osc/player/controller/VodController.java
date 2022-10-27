@@ -3,6 +3,7 @@ package com.github.tvbox.osc.player.controller;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Message;
 import android.view.KeyEvent;
@@ -198,6 +199,7 @@ public class VodController extends BaseController {
         lockerLeft = findViewById(R.id.play_screen_lock_left);
         lockerRight = findViewById(R.id.play_screen_lock_right);
         tvBack = findViewById(R.id.tv_back);
+        mSubtitleBtn = findViewById(R.id.play_subtitle);
         playAudio = findViewById(R.id.play_audio);
         mPlayerFFwd = findViewById(R.id.play_ff);
         mGridView.setLayoutManager(new V7LinearLayoutManager(getContext(), 0, false));
