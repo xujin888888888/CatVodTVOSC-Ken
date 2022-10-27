@@ -224,7 +224,7 @@ public class PlayerFragment  extends BaseLazyFragment {
             }
 
             @Override
-            public void errReplay() {
+            public void errReplay(false) {
                 errorWithRetry("视频播放出错", false);
             }
 
@@ -441,7 +441,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         this.sourceKey = sourceKey;
         sourceBean = ApiConfig.get().getSource(sourceKey);
         initPlayerCfg();
-        play();
+        play(false);
     }
 
     private VodInfo clonePlayingVodeInfo(VodInfo info) {
@@ -518,7 +518,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
         mVodInfo.playIndex++;
         playingInfo.playIndex++;
-        play();
+        play(false);
     }
 
     public void playPrevious() {
@@ -534,7 +534,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
         mVodInfo.playIndex--;
         playingInfo.playIndex--;
-        play();
+        play(false);
     }
 
     private int autoRetryCount = 0;
@@ -542,15 +542,16 @@ public class PlayerFragment  extends BaseLazyFragment {
     boolean autoRetry() {
         if (autoRetryCount < 3) {
             autoRetryCount++;
-            play();
+            play(false);
             return true;
         } else {
             autoRetryCount = 0;
             return false;
         }
     }
+    
 
-    public void play() {
+    public void play(boolean reset) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type", "vod-update-info");
         jsonObject.addProperty("playFlag", mVodInfo.playFlag);
