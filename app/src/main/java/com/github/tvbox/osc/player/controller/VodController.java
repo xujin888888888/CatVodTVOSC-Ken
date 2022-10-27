@@ -133,10 +133,14 @@ public class VodController extends BaseController {
     ImageView lockerLeft;
     ImageView lockerRight;
     ImageView tvBack;
+    TextView mPlayerFFwd;
     ImageView playAudio;
-
+    float mSpeed;
+    Drawable dPlay = getResources().getDrawable(R.drawable.icon_vodcontroller_play);
+    Drawable dFFwd = getResources().getDrawable(R.drawable.play_ffwd);
     private boolean shouldShowBottom = true;
     private boolean shouldShowLoadingSpeed = Hawk.get(HawkConfig.DISPLAY_LOADING_SPEED, true);
+    private boolean shouldShowLoadingSpeedRt = Hawk.get(HawkConfig.DISPLAY_LOADING_SPEED, true);
     private Runnable mRunnable = new Runnable() {
         @SuppressLint({"DefaultLocale", "SetTextI18n"})
         @Override
@@ -194,7 +198,7 @@ public class VodController extends BaseController {
         lockerRight = findViewById(R.id.play_screen_lock_right);
         tvBack = findViewById(R.id.tv_back);
         playAudio = findViewById(R.id.play_audio);
-
+        mPlayerFFwd = findViewById(R.id.play_ff);
         mGridView.setLayoutManager(new V7LinearLayoutManager(getContext(), 0, false));
 
         parseAdapter = new ParseAdapter();
@@ -249,10 +253,20 @@ public class VodController extends BaseController {
         mPlayerRetry.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.replay();
+                listener.replay(true);
                 hideBottom();
             }
         });
+        
+        mPlayerRetry.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                listener.replay(false);
+                hideBottom();
+                return true;
+            }
+        });
+        
         mPlayPause.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -290,6 +304,19 @@ public class VodController extends BaseController {
                 }
             }
         });
+                 // takagen99 : Long Press to change orientation
+        mPlayerScaleBtn.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                int checkOrientation = mActivity.getRequestedOrientation();
+                if (checkOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+                    mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                } else if (checkOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT || checkOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
+                    mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                }
+                return true;
+            }
+        });
         mPlayerSpeedBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -305,6 +332,21 @@ public class VodController extends BaseController {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        mPlayerBtn.setOnClickListener(new OnClickListener() {
+        @Override
+            public boolean onLongClick(View view) {
+                try {
+                    mPlayerFFwd.setCompoundDrawablesWithIntrinsicBounds(dFFwd, null, null, null);
+                    mPlayerConfig.put("sp", 1.0f);
+                    updatePlayerCfgView();
+                    listener.updatePlayerCfg();
+                    mControlWrapper.setSpeed(1.0f);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return true;
             }
         });
         mPlayerBtn.setOnClickListener(new OnClickListener() {
@@ -326,7 +368,7 @@ public class VodController extends BaseController {
                     mPlayerConfig.put("pl", playerType);
                     updatePlayerCfgView();
                     listener.updatePlayerCfg();
-                    listener.replay();
+                    listener.replay(false);
                     // hideBottom();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -352,7 +394,7 @@ public class VodController extends BaseController {
                     mPlayerConfig.put("ijk", ijk);
                     updatePlayerCfgView();
                     listener.updatePlayerCfg();
-                    listener.replay();
+                    listener.replay(false);
                     hideBottom();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -439,6 +481,28 @@ public class VodController extends BaseController {
                 Hawk.put(HawkConfig.PLAY_TIME_STEP, 5);
                 updatePlayerCfgView();
                 return true;
+            }
+        });
+
+                mPlayerFFwd.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSpeed == 6.0f) {
+                    mSpeed = 1.0f;
+                    mPlayerFFwd.setCompoundDrawablesWithIntrinsicBounds(dFFwd, null, null, null);
+                } else {
+                    mSpeed = 6.0f;
+                    mPlayerFFwd.setCompoundDrawablesWithIntrinsicBounds(dPlay, null, null, null);
+                }
+                ;
+                try {
+                    mPlayerConfig.put("sp", mSpeed);
+                    updatePlayerCfgView();
+                    listener.updatePlayerCfg();
+                    mControlWrapper.setSpeed(mSpeed);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -549,7 +613,7 @@ public class VodController extends BaseController {
         if(listener != null)
             listener.updatePlayerCfg();
         if(changedOption.equals("pl") || changedOption.equals("ijk"))
-            listener.replay();
+            listener.replay(false);
         if(changedOption.equals("sc")) {
             try {
                 mControlWrapper.setScreenScaleType(this.mPlayerConfig.getInt("sc"));
@@ -619,7 +683,7 @@ public class VodController extends BaseController {
 
         void updatePlayerCfg();
 
-        void replay();
+        void replay(false);
 
         void errReplay();
 
