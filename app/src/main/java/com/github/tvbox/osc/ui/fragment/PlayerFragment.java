@@ -224,7 +224,7 @@ public class PlayerFragment  extends BaseLazyFragment {
             }
 
             @Override
-            public void errReplay(false) {
+            public void errReplay() {
                 errorWithRetry("视频播放出错", false);
             }
 
