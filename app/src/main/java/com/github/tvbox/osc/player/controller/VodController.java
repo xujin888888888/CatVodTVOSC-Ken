@@ -683,7 +683,7 @@ public class VodController extends BaseController {
 
         void updatePlayerCfg();
 
-        void replay(false);
+        void replay(boolean replay);
 
         void errReplay();
 
