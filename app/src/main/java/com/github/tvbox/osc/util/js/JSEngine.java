@@ -14,11 +14,18 @@ import com.github.tvbox.quickjs.JSCallFunction;
 import com.github.tvbox.quickjs.JSModule;
 import com.github.tvbox.quickjs.JSObject;
 import com.github.tvbox.quickjs.QuickJSContext;
+import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
 
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -220,8 +227,8 @@ public class JSEngine {
                             }
                             if (body == null) {
                                 String dataBody = opt.optString("body", "").trim();
-                                if (!dataBody.isEmpty() && headers.get("content-type") != null) {
-                                    body = RequestBody.create(MediaType.parse(headers.get("content-type")), opt.optString("body", ""));
+                                if (!dataBody.isEmpty() && headers.get("Content-Type") != null) {
+                                    body = RequestBody.create(MediaType.parse(headers.get("Content-Type")), opt.optString("body", ""));
                                 }
                             }
                             if (body == null) {
@@ -252,9 +259,75 @@ public class JSEngine {
                         } else if (returnBuffer == 2) {
                             jsObject.setProperty("content", Base64.encodeToString(response.body().bytes(), Base64.DEFAULT));
                         } else {
-                            jsObject.setProperty("content", response.body().string());
+                            String res;
+                            if(headers.get("Content-Type")!=null && headers.get("Content-Type").contains("=")){
+                                byte[] responseBytes = UTF8BOMFighter.removeUTF8BOM(response.body().bytes());
+                                res=new String(responseBytes,headers.get("Content-Type").split("=")[1].trim());
+                            }else {
+                                res=response.body().string();
+                            }
+                            jsObject.setProperty("content", res);
                         }
                         return jsObject;
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                    return "";
+                }
+            });
+            jsContext.getGlobalObject().setProperty("joinUrl", new JSCallFunction() {
+                @Override
+                public String call(Object... args) {
+                    URL url;
+                    String q="";
+                    try {
+                        String parent = args[0].toString();
+                        String child = args[1].toString();
+                    // TODO
+                        if(parent.isEmpty()){
+                            return child;
+                        }
+                        url = new URL(new URL(parent),child);
+                        q= url.toExternalForm();
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                    return q;
+                }
+            });
+            jsContext.getGlobalObject().setProperty("pdfh", new JSCallFunction() {
+                @Override
+                public String call(Object... args) {
+                    try {
+//                        LOG.i("pdfh----------------:"+args[1].toString().trim());
+                        String html=args[0].toString();
+                        return HtmlParser.parseDomForUrl(html, args[1].toString().trim(), "");
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                    return "";
+                }
+            });
+            jsContext.getGlobalObject().setProperty("pdfa", new JSCallFunction() {
+                @Override
+                public Object call(Object... args) {
+                    try {
+//                        LOG.i("pdfa----------------:"+args[1].toString().trim());
+                        String html=args[0].toString();
+                        return jsContext.parseJSON(new Gson().toJson(HtmlParser.parseDomForList(html, args[1].toString().trim())));
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                    return null;
+                }
+            });
+            jsContext.getGlobalObject().setProperty("pd", new JSCallFunction() {
+                @Override
+                public String call(Object... args) {
+                    try {
+//                        LOG.i("pd----------------:"+args[2].toString().trim());
+                        String html=args[0].toString();
+                        return HtmlParser.parseDomForUrl(html, args[1].toString().trim(), args[2].toString());
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                     }
