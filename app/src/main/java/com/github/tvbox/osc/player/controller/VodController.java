@@ -1,5 +1,4 @@
 package com.github.tvbox.osc.player.controller;
-import static xyz.doikki.videoplayer.util.PlayerUtils.stringForTime;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
@@ -38,11 +37,11 @@ import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.List;
 
 import xyz.doikki.videoplayer.player.VideoView;
