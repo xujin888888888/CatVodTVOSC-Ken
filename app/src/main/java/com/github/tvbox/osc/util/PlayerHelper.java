@@ -32,9 +32,9 @@ import xyz.doikki.videoplayer.render.TextureRenderViewFactory;
 public class PlayerHelper {
 
     private static Map<Integer, String> AVAILABLE_DEFAULT_PLAYERS = new TreeMap<Integer, String>() {{
-        put(0, "系统播放器");
-        put(1, "IJK播放器");
-        put(2, "Exo播放器");
+        put(0, "系统");
+        put(1, "IJK");
+        put(2, "Exo");
     }};
     private static Map<Integer, String> AVAILABLE_3RD_PLAYERS = new TreeMap<Integer, String>();
 
@@ -212,16 +212,16 @@ public class PlayerHelper {
     public static void reload3rdPlayers() {
         AVAILABLE_3RD_PLAYERS.clear();
         if(MXPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(10, "MX Player");
+            AVAILABLE_3RD_PLAYERS.put(10, "MX");
         }
         if(ReexPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(11, "Reex Player");
+            AVAILABLE_3RD_PLAYERS.put(11, "Reex");
         }
         if(UCPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(12, "UC浏览器");
+            AVAILABLE_3RD_PLAYERS.put(12, "UC");
         }
         if(DangbeiPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(13, "当贝播放器");
+            AVAILABLE_3RD_PLAYERS.put(13, "当贝");
         }
         if(KodiPlayer.getPackageInfo() != null) {
             AVAILABLE_3RD_PLAYERS.put(14, "Kodi");
