@@ -129,6 +129,7 @@ public class VodController extends BaseController {
     TextView mPlayerTimeSkipBtn;
     TextView mPlayerTimeStepBtn;
     TextView loadingSpeed;
+    TextView loadingSpeedRt;
     TextView tvVideoInfo;
     TextView finishAt;
     TextView btnHint;
@@ -147,15 +148,16 @@ public class VodController extends BaseController {
         @SuppressLint({"DefaultLocale", "SetTextI18n"})
         @Override
         public void run() {
-            Date date = new Date();
+                        Date date = new Date();
             @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
+            loadingSpeedRt.setText(PlayerHelper.getDisplaySpeed(mControlWrapper.getTcpSpeed()));
             tvDate.setText(timeFormat.format(date));
             if(mControlWrapper.getDuration() > 0) {
-                SimpleDateFormat onlyTimeFormat = new SimpleDateFormat("HH:mm");
+                SimpleDateFormat onlyTimeFormat = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
                 long remainTime = mControlWrapper.getDuration() - mControlWrapper.getCurrentPosition();
                 Date endTime = new Date(date.getTime() + remainTime);
-                finishAt.setText("本集完结于 " + onlyTimeFormat.format(endTime));
+                finishAt.setText("Ends at " + onlyTimeFormat.format(endTime));
             } else {
                 finishAt.setText("");
             }
@@ -193,6 +195,7 @@ public class VodController extends BaseController {
         mPlayerTimeSkipBtn = findViewById(R.id.play_time_end);
         mPlayerTimeStepBtn = findViewById(R.id.play_time_step);
         loadingSpeed = findViewById(R.id.loadingSpeed);
+        loadingSpeedRt = findViewById(R.id.loadingSpeedRt);
         tvVideoInfo = findViewById(R.id.tv_video_info);
         finishAt = findViewById(R.id.tv_finish_at);
         btnHint = findViewById(R.id.play_btn_hint);
