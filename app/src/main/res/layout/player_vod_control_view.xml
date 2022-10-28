@@ -713,6 +713,33 @@
         android:textColor="@color/color_FFFFFF"
         android:textSize="@dimen/ts_22"
         android:visibility="gone" />
+        
+            <TextView
+        android:id="@+id/play_btn_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/vs_5"
+        android:layout_marginRight="@dimen/vs_5"
+        android:alpha="0"
+        android:background="@drawable/shape_source_focus"
+        android:gravity="center"
+        android:padding="@dimen/vs_10"
+        android:text="hint"
+        android:textColor="@color/color_CC000000"
+        android:textSize="@dimen/ts_20"
+        android:visibility="gone"
+        tools:visibility="gone" />    
+        
+        
+    <ImageView
+                    android:id="@+id/tv_back"
+                    android:layout_width="@dimen/vs_60"
+                    android:layout_height="@dimen/vs_60"
+                    android:layout_gravity="start|left|center_vertical"
+                    android:layout_marginEnd="@dimen/vs_10"
+                    android:layout_marginRight="@dimen/vs_10"
+                    app:srcCompat="@drawable/icon_back"
+                     android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/play_screen_lock_left"
