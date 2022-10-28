@@ -509,8 +509,7 @@
                 android:textSize="@dimen/ts_16"
                 tools:visibility="gone" />
                 
-           
-            <ImageView
+           <ImageView
                 android:id="@+id/play_audio"
                 android:layout_width="@dimen/vs_50"
                 android:layout_height="wrap_content"
@@ -518,13 +517,14 @@
                 android:layout_marginLeft="@dimen/vs_2"
                 android:layout_marginEnd="@dimen/vs_2"
                 android:layout_marginRight="@dimen/vs_2"
-                android:background="@drawable/icon_vodcontroller_selectcircle"
+                android:layout_gravity="center"
+                android:background="@drawable/button_dialog_vod"
                 android:focusable="true"
                 android:padding="@dimen/vs_8"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/icon_headphone" />
-
-            <ImageView
+                app:srcCompat="@drawable/play_audio" />
+                        
+           <ImageView
                 android:id="@+id/play_subtitle"
                 android:layout_width="@dimen/vs_50"
                 android:layout_height="wrap_content"
@@ -532,12 +532,12 @@
                 android:layout_marginLeft="@dimen/vs_2"
                 android:layout_marginEnd="@dimen/vs_2"
                 android:layout_marginRight="@dimen/vs_2"
-                android:background="@drawable/icon_vodcontroller_selectcircle"
+                android:layout_gravity="center"
+                android:background="@drawable/button_dialog_vod"
                 android:focusable="true"
                 android:padding="@dimen/vs_8"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/icon_subtitle"
-                tools:visibility="gone" />
+                app:srcCompat="@drawable/play_subtitle" />
                     
                  <TextView
                 android:id="@+id/play_time_start"
