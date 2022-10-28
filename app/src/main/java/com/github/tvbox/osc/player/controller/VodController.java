@@ -1,5 +1,5 @@
 package com.github.tvbox.osc.player.controller;
-
+import static xyz.doikki.videoplayer.util.PlayerUtils.stringForTime;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
