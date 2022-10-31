@@ -29,6 +29,14 @@ import xyz.doikki.videoplayer.player.VideoView;
 import xyz.doikki.videoplayer.render.RenderViewFactory;
 import xyz.doikki.videoplayer.render.TextureRenderViewFactory;
 
+    private static Map<Integer, String> AVAILABLE_DEFAULT_PLAYERS = new TreeMap<Integer, String>() {{
+        put(0, "系统播放器");
+        put(1, "IJK播放器");
+        put(2, "Exo播放器");
+    }};
+    private static Map<Integer, String> AVAILABLE_3RD_PLAYERS = new TreeMap<Integer, String>();
+
+
 public class PlayerHelper {
       public static void updateCfg(VideoView videoView, JSONObject playerCfg) {
         int playerType = Hawk.get(HawkConfig.PLAY_TYPE, 0);
@@ -161,6 +169,25 @@ public class PlayerHelper {
             return "Kodi";
         } else {
             return "系统";
+        }
+    }
+    
+        public static void reload3rdPlayers() {
+        AVAILABLE_3RD_PLAYERS.clear();
+        if(MXPlayer.getPackageInfo() != null) {
+            AVAILABLE_3RD_PLAYERS.put(10, "MX Player");
+        }
+        if(ReexPlayer.getPackageInfo() != null) {
+            AVAILABLE_3RD_PLAYERS.put(11, "Reex Player");
+        }
+        if(UCPlayer.getPackageInfo() != null) {
+            AVAILABLE_3RD_PLAYERS.put(12, "UC浏览器");
+        }
+        if(DangbeiPlayer.getPackageInfo() != null) {
+            AVAILABLE_3RD_PLAYERS.put(13, "当贝播放器");
+        }
+        if(KodiPlayer.getPackageInfo() != null) {
+            AVAILABLE_3RD_PLAYERS.put(14, "Kodi");
         }
     }
     
