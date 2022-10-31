@@ -469,7 +469,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         this.sourceKey = sourceKey;
         sourceBean = ApiConfig.get().getSource(sourceKey);
         initPlayerCfg();
-        play();
+        play(false);
     }
 
     private VodInfo clonePlayingVodeInfo(VodInfo info) {
@@ -548,7 +548,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
         mVodInfo.playIndex++;
         playingInfo.playIndex++;
-        play();
+        play(false);
     }
 
     public void playPrevious() {
@@ -564,7 +564,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
         mVodInfo.playIndex--;
         playingInfo.playIndex--;
-        play();
+        play(false);
     }
 
     private int autoRetryCount = 0;
@@ -572,7 +572,7 @@ public class PlayerFragment  extends BaseLazyFragment {
     boolean autoRetry() {
         if (autoRetryCount < 3) {
             autoRetryCount++;
-            play();
+            play(false);
             return true;
         } else {
             autoRetryCount = 0;
