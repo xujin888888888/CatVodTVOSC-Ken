@@ -30,6 +30,15 @@ import xyz.doikki.videoplayer.render.RenderViewFactory;
 import xyz.doikki.videoplayer.render.TextureRenderViewFactory;
 
 public class PlayerHelper {
+
+    private static Map<Integer, String> AVAILABLE_DEFAULT_PLAYERS = new TreeMap<Integer, String>() {{
+        put(0, "系统");
+        put(1, "IJK");
+        put(2, "Exo");
+        put(10, "MX");
+        put(11, "Reex");
+        put(12, "Kodi");
+    }};
     
     private static Map<Integer, String> AVAILABLE_3RD_PLAYERS = new TreeMap<Integer, String>();
 
@@ -186,6 +195,13 @@ public class PlayerHelper {
         if(KodiPlayer.getPackageInfo() != null) {
             AVAILABLE_3RD_PLAYERS.put(14, "Kodi");
         }
+    }
+    
+    public static String getPlayerName(int playType) {
+        if(AVAILABLE_DEFAULT_PLAYERS.containsKey(playType))
+            return AVAILABLE_DEFAULT_PLAYERS.get(playType);
+        else
+            return AVAILABLE_DEFAULT_PLAYERS.get(0);
     }
     
     public static String get3rdPlayerName(int playType) {
