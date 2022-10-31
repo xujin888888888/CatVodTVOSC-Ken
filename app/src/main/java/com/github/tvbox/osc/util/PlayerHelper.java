@@ -30,16 +30,7 @@ import xyz.doikki.videoplayer.render.RenderViewFactory;
 import xyz.doikki.videoplayer.render.TextureRenderViewFactory;
 
 public class PlayerHelper {
-
-    private static Map<Integer, String> AVAILABLE_DEFAULT_PLAYERS = new TreeMap<Integer, String>() {{
-        put(0, "系统");
-        put(1, "IJK");
-        put(2, "Exo");
-    }};
-    private static Map<Integer, String> AVAILABLE_3RD_PLAYERS = new TreeMap<Integer, String>();
-
-
-    public static void updateCfg(VideoView videoView, JSONObject playerCfg) {
+      public static void updateCfg(VideoView videoView, JSONObject playerCfg) {
         int playerType = Hawk.get(HawkConfig.PLAY_TYPE, 0);
         int renderType = Hawk.get(HawkConfig.PLAY_RENDER, 0);
         String ijkCode = Hawk.get(HawkConfig.IJK_CODEC, "软解码");
@@ -158,21 +149,18 @@ public class PlayerHelper {
     }
 
     public static String getPlayerName(int playType) {
-        if(AVAILABLE_DEFAULT_PLAYERS.containsKey(playType))
-            return AVAILABLE_DEFAULT_PLAYERS.get(playType);
-        else
-            return AVAILABLE_DEFAULT_PLAYERS.get(0);
-    }
-
-    public static String get3rdPlayerName(int playType) {
-        if(AVAILABLE_3RD_PLAYERS.containsKey(playType))
-            return AVAILABLE_3RD_PLAYERS.get(playType);
-        else {
-            Integer[] types = getAvailable3rdPlayerTypes();
-            if(types.length > 0)
-                return AVAILABLE_3RD_PLAYERS.get(types[0]);
-            else
-                return null;
+        if (playType == 1) {
+            return "IJK";
+        } else if (playType == 2) {
+            return "Exo";
+        } else if (playType == 10) {
+            return "MX";
+        } else if (playType == 11) {
+            return "Reex";
+        } else if (playType == 12) {
+            return "Kodi";
+        } else {
+            return "系统";
         }
     }
 
@@ -209,62 +197,6 @@ public class PlayerHelper {
         return scaleText;
     }
 
-    public static void reload3rdPlayers() {
-        AVAILABLE_3RD_PLAYERS.clear();
-        if(MXPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(10, "MX");
-        }
-        if(ReexPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(11, "Reex");
-        }
-        if(UCPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(12, "UC");
-        }
-        if(DangbeiPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(13, "当贝");
-        }
-        if(KodiPlayer.getPackageInfo() != null) {
-            AVAILABLE_3RD_PLAYERS.put(14, "Kodi");
-        }
-    }
-
-    public static boolean playOn3rdPlayer(int playerType, Activity mActivity, String playingUrl, String playTitle, String playSubtitle, HashMap<String, String> playingHeader) {
-        boolean callResult = false;
-        switch (playerType) {
-            case 10: {
-                callResult = MXPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
-                break;
-            }
-            case 11: {
-                callResult = ReexPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
-                break;
-            }
-            case 12: {
-                callResult = UCPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
-                break;
-            }
-            case 13: {
-                callResult = DangbeiPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
-                break;
-            }
-            case 14: {
-                callResult = KodiPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
-            }
-        }
-        return callResult;
-    }
-
-    public static Integer[] getAvailable3rdPlayerTypes() {
-        Integer[] types = new Integer[AVAILABLE_3RD_PLAYERS.keySet().size()];
-        AVAILABLE_3RD_PLAYERS.keySet().toArray(types);
-        return types;
-    }
-
-    public static Integer[] getAvailableDefaultPlayerTypes() {
-        Integer[] types = new Integer[AVAILABLE_DEFAULT_PLAYERS.keySet().size()];
-        AVAILABLE_DEFAULT_PLAYERS.keySet().toArray(types);
-        return types;
-    }
 
     public static String getDisplaySpeed(long speed) {
         if(speed > 1048576)
