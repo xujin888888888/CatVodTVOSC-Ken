@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -25,6 +25,9 @@ import com.github.tvbox.osc.bean.IJKCode;
 import com.github.tvbox.osc.bean.ParseBean;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.adapter.ParseAdapter;
+import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
+import com.github.tvbox.osc.ui.dialog.SelectDialog;
+import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.ui.fragment.PlayerFragment;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
@@ -354,26 +357,57 @@ public class VodController extends BaseController {
             }
         });
         mPlayerBtn.setOnClickListener(new OnClickListener() {
-            @Override
+                        @Override
             public void onClick(View view) {
+                FastClickCheckUtil.check(view);
                 try {
-                    int playerType = mPlayerConfig.getInt("pl");
-                    Integer[] playerTypes = PlayerHelper.getAvailableDefaultPlayerTypes();
-                    for (int i = 0; i <playerTypes.length; i++) {
-                        if(playerTypes[i] != playerType)
-                            continue;
-                        else if(i + 1 < playerTypes.length) {
-                            playerType = playerTypes[i+1];
-                            break;
-                        } else {
-                            playerType = playerTypes[0];
-                        }
+                    int defaultPos = mPlayerConfig.getInt("pl");
+                    ArrayList<Integer> players = new ArrayList<>();
+                    players.add(0);
+                    players.add(1);
+                    players.add(2);
+                    if (mxPlayerExist) {
+                        players.add(10);
                     }
-                    mPlayerConfig.put("pl", playerType);
-                    updatePlayerCfgView();
-                    listener.updatePlayerCfg();
-                    listener.replay(false);
-                    // hideBottom();
+                    if (reexPlayerExist) {
+                        players.add(11);
+                    }
+                    if (KodiExist) {
+                        players.add(12);
+                    }
+                    SelectDialog<Integer> dialog = new SelectDialog<>(mActivity);
+                    dialog.setTip(HomeActivity.getRes().getString(R.string.dia_player));
+                    dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<Integer>() {
+                        @Override
+                        public void click(Integer value, int pos) {
+                            try {
+                                dialog.cancel();
+                                int thisPlayType = players.get(pos);
+                                mPlayerConfig.put("pl", thisPlayType);
+                                updatePlayerCfgView();
+                                listener.updatePlayerCfg();
+                                listener.replay(false);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public String getDisplay(Integer val) {
+                            return PlayerHelper.getPlayerName(val);
+                        }
+                    }, new DiffUtil.ItemCallback<Integer>() {
+                        @Override
+                        public boolean areItemsTheSame(@NonNull @NotNull Integer oldItem, @NonNull @NotNull Integer newItem) {
+                            return oldItem.intValue() == newItem.intValue();
+                        }
+
+                        @Override
+                        public boolean areContentsTheSame(@NonNull @NotNull Integer oldItem, @NonNull @NotNull Integer newItem) {
+                            return oldItem.intValue() == newItem.intValue();
+                        }
+                    }, players, defaultPos);
+                    dialog.show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
