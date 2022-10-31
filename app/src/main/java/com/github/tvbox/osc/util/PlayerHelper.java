@@ -183,6 +183,44 @@ public class PlayerHelper {
             return "TextureView";
         }
     }
+    
+public static boolean playOn3rdPlayer(int playerType, Activity mActivity, String playingUrl, String playTitle, String playSubtitle, HashMap<String, String> playingHeader) {
+        boolean callResult = false;
+        switch (playerType) {
+            case 10: {
+                callResult = MXPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
+                break;
+            }
+            case 11: {
+                callResult = ReexPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
+                break;
+            }
+            case 12: {
+                callResult = UCPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
+                break;
+            }
+            case 13: {
+                callResult = DangbeiPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
+                break;
+            }
+            case 14: {
+                callResult = KodiPlayer.run(mActivity, playingUrl, playTitle, playSubtitle, playingHeader);
+            }
+        }
+        return callResult;
+    }
+
+    public static Integer[] getAvailable3rdPlayerTypes() {
+        Integer[] types = new Integer[AVAILABLE_3RD_PLAYERS.keySet().size()];
+        AVAILABLE_3RD_PLAYERS.keySet().toArray(types);
+        return types;
+    }
+
+    public static Integer[] getAvailableDefaultPlayerTypes() {
+        Integer[] types = new Integer[AVAILABLE_DEFAULT_PLAYERS.keySet().size()];
+        AVAILABLE_DEFAULT_PLAYERS.keySet().toArray(types);
+        return types;
+    }
 
     public static String getScaleName(int screenScaleType) {
         String scaleText = "默认";
