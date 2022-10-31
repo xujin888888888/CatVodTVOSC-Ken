@@ -29,11 +29,10 @@ import xyz.doikki.videoplayer.player.VideoView;
 import xyz.doikki.videoplayer.render.RenderViewFactory;
 import xyz.doikki.videoplayer.render.TextureRenderViewFactory;
 
+public class PlayerHelper {
     
     private static Map<Integer, String> AVAILABLE_3RD_PLAYERS = new TreeMap<Integer, String>();
 
-
-public class PlayerHelper {
       public static void updateCfg(VideoView videoView, JSONObject playerCfg) {
         int playerType = Hawk.get(HawkConfig.PLAY_TYPE, 0);
         int renderType = Hawk.get(HawkConfig.PLAY_RENDER, 0);
@@ -200,14 +199,6 @@ public class PlayerHelper {
                 return null;
         }
     }
-
-    public static String getRenderName(int renderType) {
-        if (renderType == 1) {
-            return "SurfaceView";
-        } else {
-            return "TextureView";
-        }
-    }
     
 public static boolean playOn3rdPlayer(int playerType, Activity mActivity, String playingUrl, String playTitle, String playSubtitle, HashMap<String, String> playingHeader) {
         boolean callResult = false;
@@ -239,6 +230,14 @@ public static boolean playOn3rdPlayer(int playerType, Activity mActivity, String
         Integer[] types = new Integer[AVAILABLE_3RD_PLAYERS.keySet().size()];
         AVAILABLE_3RD_PLAYERS.keySet().toArray(types);
         return types;
+    }
+    
+public static String getRenderName(int renderType) {
+        if (renderType == 1) {
+            return "SurfaceView";
+        } else {
+            return "TextureView";
+        }
     }
 
     public static String getScaleName(int screenScaleType) {
