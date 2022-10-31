@@ -130,7 +130,6 @@ public class VodController extends BaseController {
     TextView mPlayerSpeedBtn;
     TextView mPlayerBtn;
     TextView mPlayerIJKBtn;
-    TextView m3rdPlayerBtn;
     ImageView mPlayerRetry;
     TextView mPlayerTimeStartBtn;
     TextView mPlayerTimeSkipBtn;
@@ -197,7 +196,6 @@ public class VodController extends BaseController {
         mPlayerSpeedBtn = findViewById(R.id.play_speed);
         mPlayerBtn = findViewById(R.id.play_player);
         mPlayerIJKBtn = findViewById(R.id.play_ijk);
-        m3rdPlayerBtn = findViewById(R.id.play_3rdplayer);
         mPlayerTimeStartBtn = findViewById(R.id.play_time_start);
         mPlayerTimeSkipBtn = findViewById(R.id.play_time_end);
         mPlayerTimeStepBtn = findViewById(R.id.play_time_step);
@@ -549,68 +547,6 @@ public class VodController extends BaseController {
             }
         });
 
-        m3rdPlayerBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Integer[] types = PlayerHelper.getAvailable3rdPlayerTypes();
-                if(types.length > 0) {
-                    Integer selectedType = Hawk.get(HawkConfig.THIRD_PARTY_PLAYER, types[0]);
-                    VodController.this.playerFragment.playInOtherPlayer(selectedType);
-                }
-            }
-        });
-        tvDate.post(new Runnable() {
-            @Override
-            public void run() {
-                mHandler.post(mRunnable);
-            }
-        });
-        lockerLeft.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleLockController();
-            }
-        });
-        lockerRight.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleLockController();
-            }
-        });
-        if(Hawk.get(HawkConfig.TV_TYPE, 0) == 0) {
-            tvBack.setVisibility(GONE);
-        } else {
-            tvBack.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    enableController(false);
-                    stopFullScreen();
-                }
-            });
-        }
-        init3rdPlayerButton();
-        playAudio.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.setAudioTrack();
-            }
-        });
-    }
-
-    public void init3rdPlayerButton() {
-        PlayerHelper.reload3rdPlayers();
-        Integer[] types = PlayerHelper.getAvailable3rdPlayerTypes();
-        if(types.length <= 0) {
-            m3rdPlayerBtn.setVisibility(View.GONE);
-        } else {
-            m3rdPlayerBtn.setVisibility(View.VISIBLE);
-            Integer selectedType = Hawk.get(HawkConfig.THIRD_PARTY_PLAYER, types[0]);
-            if(Arrays.binarySearch(types, selectedType) < 0)
-                Hawk.put(HawkConfig.THIRD_PARTY_PLAYER, types[0]);
-            m3rdPlayerBtn.setText(PlayerHelper.get3rdPlayerName(selectedType));
-        }
-    }
-
     private void sendScreenChange(boolean isFullscreen) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type", "detail");
@@ -640,12 +576,17 @@ public class VodController extends BaseController {
     }
 
     private JSONObject mPlayerConfig = null;
+    
+    private boolean mxPlayerExist = false;
+    private boolean reexPlayerExist = false;
+    private boolean KodiExist = false;
 
-
-    public void setPlayerConfig(JSONObject playerCfg) {
+public void setPlayerConfig(JSONObject playerCfg) {
         this.mPlayerConfig = playerCfg;
-        listener.updatePlayerCfg();
         updatePlayerCfgView();
+        mxPlayerExist = MXPlayer.getPackageInfo() != null;
+        reexPlayerExist = ReexPlayer.getPackageInfo() != null;
+        KodiExist = Kodi.getPackageInfo() != null;
     }
 
     public JSONObject getPlayerConfig() {
@@ -972,9 +913,7 @@ public class VodController extends BaseController {
         } else if(focusedView == mPlayerBtn) {
             doShowHint(mPlayerBtn, "播放器", postDelay);
         } else if(focusedView == mPlayerIJKBtn) {
-            doShowHint(mPlayerIJKBtn, "IJK解码器", postDelay);
-        } else if(focusedView == m3rdPlayerBtn) {
-            doShowHint(m3rdPlayerBtn, "第三方播放器", postDelay);
+            doShowHint(mPlayerIJKBtn, "IJK解码器", postDelay);    
         } else if(focusedView == mPlayerTimeStartBtn) {
             doShowHint(mPlayerTimeStartBtn, "跳过片头", postDelay);
         } else if(focusedView == mPlayerTimeSkipBtn) {
