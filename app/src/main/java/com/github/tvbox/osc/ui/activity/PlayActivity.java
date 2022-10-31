@@ -89,6 +89,8 @@ public class PlayActivity extends BaseActivity {
         }
         return super.dispatchKeyEvent(event);
     }
+    
+            
 
     @Override
     protected void onResume() {
@@ -97,9 +99,7 @@ public class PlayActivity extends BaseActivity {
         if (videoView != null) {
             videoView.resume();
         }
-        VodController controller = playerFragment.getVodController();
-        if(controller != null)
-            controller.init3rdPlayerButton();
+        
     }
 
 
