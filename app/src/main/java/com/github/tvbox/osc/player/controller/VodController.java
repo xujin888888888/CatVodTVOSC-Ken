@@ -546,6 +546,43 @@ public class VodController extends BaseController {
                 }
             }
         });
+        
+        tvDate.post(new Runnable() {
+            @Override
+            public void run() {
+                mHandler.post(mRunnable);
+            }
+        });
+        lockerLeft.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleLockController();
+            }
+        });
+        lockerRight.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleLockController();
+            }
+        });
+        if(Hawk.get(HawkConfig.TV_TYPE, 0) == 0) {
+            tvBack.setVisibility(GONE);
+        } else {
+            tvBack.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    enableController(false);
+                    stopFullScreen();
+                }
+            });
+        }
+        playAudio.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.setAudioTrack();
+            }
+        });
+    }
 
     private void sendScreenChange(boolean isFullscreen) {
         JsonObject jsonObject = new JsonObject();
