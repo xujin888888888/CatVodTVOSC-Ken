@@ -219,14 +219,11 @@ public class PlayerFragment  extends BaseLazyFragment {
             }
 
             @Override
-            public void replay() {
+            public void replay(boolean replay) {
                 autoRetryCount = 0;
-                String progressKey = playingUrl; //mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
-                replayKey = progressKey;
-                if(mVideoView.getCurrentPlayState() != VideoView.STATE_ERROR)
-                    lastParseBean = null;
-                play();
+                play(replay);
             }
+
 
             @Override
             public void errReplay() {
