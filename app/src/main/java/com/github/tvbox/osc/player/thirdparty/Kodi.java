@@ -14,42 +14,39 @@ import com.github.tvbox.osc.base.App;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-public class MXPlayer {
-    public static final String TAG = "ThirdParty.MXPlayer";
+public class Kodi {
+    public static final String TAG = "ThirdParty.Kodi";
 
-    private static final String PACKAGE_NAME_PRO = "com.mxtech.videoplayer.pro";
-    private static final String PACKAGE_NAME_AD = "com.mxtech.videoplayer.ad";
-    private static final String PLAYBACK_ACTIVITY_PRO = "com.mxtech.videoplayer.ActivityScreen";
-    private static final String PLAYBACK_ACTIVITY_AD = "com.mxtech.videoplayer.ad.ActivityScreen";
+    private static final String PACKAGE_NAME = "org.xbmc.kodi";
+    private static final String PLAYBACK_ACTIVITY = "org.xbmc.kodi.Splash";
 
-    private static class MXPackageInfo {
+    private static class KodiPackageInfo {
         final String packageName;
         final String activityName;
 
-        MXPackageInfo(String packageName, String activityName) {
+        KodiPackageInfo(String packageName, String activityName) {
             this.packageName = packageName;
             this.activityName = activityName;
         }
     }
 
-    private static final MXPackageInfo[] PACKAGES = {
-            new MXPackageInfo(PACKAGE_NAME_PRO, PLAYBACK_ACTIVITY_PRO),
-            new MXPackageInfo(PACKAGE_NAME_AD, PLAYBACK_ACTIVITY_AD),
+    private static final KodiPackageInfo[] PACKAGES = {
+            new KodiPackageInfo(PACKAGE_NAME, PLAYBACK_ACTIVITY),
     };
 
     /**
-     * @return null if any MX Player packages not exist.
+     * @return null if any Kodi packages not exist.
      */
-    public static MXPackageInfo getPackageInfo() {
-        for (MXPackageInfo pkg : PACKAGES) {
+    public static KodiPackageInfo getPackageInfo() {
+        for (KodiPackageInfo pkg : PACKAGES) {
             try {
                 ApplicationInfo info = App.getInstance().getPackageManager().getApplicationInfo(pkg.packageName, 0);
                 if (info.enabled)
                     return pkg;
                 else
-                    Log.v(TAG, "MX Player package `" + pkg.packageName + "` is disabled.");
+                    Log.v(TAG, "Kodi package `" + pkg.packageName + "` is disabled.");
             } catch (PackageManager.NameNotFoundException ex) {
-                Log.v(TAG, "MX Player package `" + pkg.packageName + "` does not exist.");
+                Log.v(TAG, "Kodi package `" + pkg.packageName + "` does not exist.");
             }
         }
         return null;
@@ -74,7 +71,7 @@ public class MXPlayer {
 
 
     public static boolean run(Activity activity, String url, String title, String subtitle, HashMap<String, String> headers) {
-        MXPackageInfo packageInfo = getPackageInfo();
+        KodiPackageInfo packageInfo = getPackageInfo();
         if (packageInfo == null)
             return false;
 
@@ -95,17 +92,15 @@ public class MXPlayer {
             }
             intent.setData(Uri.parse(url));
             intent.putExtra("title", title);
+            intent.putExtra("name", title);
 
             if (subtitle != null && !subtitle.isEmpty()) {
-                Parcelable[] parcels = new Parcelable[1];
-                parcels[0] = Uri.parse(subtitle);
-                intent.putExtra("subs", parcels);
-                intent.putExtra("subs.enable", parcels);
+                intent.putExtra("subs", subtitle);
             }
             activity.startActivity(intent);
             return true;
         } catch (Exception ex) {
-            Log.e(TAG, "Can't run MX Player(Pro)", ex);
+            Log.e(TAG, "Can't run Kodi", ex);
             return false;
         }
     }
