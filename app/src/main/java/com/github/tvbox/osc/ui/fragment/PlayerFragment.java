@@ -218,9 +218,13 @@ public class PlayerFragment  extends BaseLazyFragment {
             }
 
             @Override
-            public void replay(boolean replay) {
+            public void replay() {
                 autoRetryCount = 0;
-                play(replay);
+                String progressKey = playingUrl; //mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
+                replayKey = progressKey;
+                if(mVideoView.getCurrentPlayState() != VideoView.STATE_ERROR)
+                    lastParseBean = null;
+                play();
             }
 
             @Override
@@ -333,6 +337,32 @@ public class PlayerFragment  extends BaseLazyFragment {
                     if (url != null) {
                         try {
                             int playerType = mVodPlayerCfg.getInt("pl");
+                        extPlay = false;
+                            if (playerType >= 10) {
+                                VodInfo.VodSeries vs = mVodInfo.seriesMap.get(mVodInfo.playFlag).get(mVodInfo.playIndex);
+                                String playTitle = mVodInfo.name + " : " + vs.name;
+                                setTip("调用外部播放器" + PlayerHelper.getPlayerName(playerType) + "进行播放", true, false);
+                                boolean callResult = false;
+                                switch (playerType) {
+                                    case 10: {
+                                        extPlay = true;
+                                        callResult = MXPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
+                                        break;
+                                    }
+                                    case 11: {
+                                        extPlay = true;
+                                        callResult = ReexPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
+                                        break;
+                                    }
+                                    case 12: {
+                                        extPlay = true;
+                                        callResult = Kodi.run(requireActivity(), url, playTitle, playSubtitle, headers);
+                                        break;
+                                    }
+                                }
+                                setTip("调用外部播放器" + PlayerHelper.getPlayerName(playerType) + (callResult ? "成功" : "失败"), callResult, !callResult);
+                                return;
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -441,7 +471,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         this.sourceKey = sourceKey;
         sourceBean = ApiConfig.get().getSource(sourceKey);
         initPlayerCfg();
-        play(false);
+        play();
     }
 
     private VodInfo clonePlayingVodeInfo(VodInfo info) {
@@ -518,7 +548,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
         mVodInfo.playIndex++;
         playingInfo.playIndex++;
-        play(false);
+        play();
     }
 
     public void playPrevious() {
@@ -534,7 +564,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
         mVodInfo.playIndex--;
         playingInfo.playIndex--;
-        play(false);
+        play();
     }
 
     private int autoRetryCount = 0;
@@ -542,16 +572,15 @@ public class PlayerFragment  extends BaseLazyFragment {
     boolean autoRetry() {
         if (autoRetryCount < 3) {
             autoRetryCount++;
-            play(false);
+            play();
             return true;
         } else {
             autoRetryCount = 0;
             return false;
         }
     }
-    
 
-    public void play(boolean reset) {
+    public void play() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type", "vod-update-info");
         jsonObject.addProperty("playFlag", mVodInfo.playFlag);
