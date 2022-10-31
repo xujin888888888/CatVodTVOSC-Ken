@@ -172,6 +172,13 @@ public class PlayerHelper {
         }
     }
     
+        public static String getPlayerName(int playType) {
+        if(AVAILABLE_DEFAULT_PLAYERS.containsKey(playType))
+            return AVAILABLE_DEFAULT_PLAYERS.get(playType);
+        else
+            return AVAILABLE_DEFAULT_PLAYERS.get(0);
+    }
+    
         public static void reload3rdPlayers() {
         AVAILABLE_3RD_PLAYERS.clear();
         if(MXPlayer.getPackageInfo() != null) {
