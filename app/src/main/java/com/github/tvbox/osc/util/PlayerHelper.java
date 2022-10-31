@@ -30,6 +30,13 @@ import xyz.doikki.videoplayer.render.RenderViewFactory;
 import xyz.doikki.videoplayer.render.TextureRenderViewFactory;
 
 public class PlayerHelper {
+
+
+    private static Map<Integer, String> AVAILABLE_DEFAULT_PLAYERS = new TreeMap<Integer, String>() {{
+        put(0, "系统");
+        put(1, "IJK");
+        put(2, "Exo");
+    }};
     
     private static Map<Integer, String> AVAILABLE_3RD_PLAYERS = new TreeMap<Integer, String>();
 
