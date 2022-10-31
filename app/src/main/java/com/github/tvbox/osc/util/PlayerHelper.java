@@ -35,9 +35,6 @@ public class PlayerHelper {
         put(0, "系统");
         put(1, "IJK");
         put(2, "Exo");
-        put(10, "MX");
-        put(11, "Reex");
-        put(12, "Kodi");
     }};
     
     private static Map<Integer, String> AVAILABLE_3RD_PLAYERS = new TreeMap<Integer, String>();
