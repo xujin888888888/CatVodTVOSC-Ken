@@ -232,6 +232,12 @@ public static boolean playOn3rdPlayer(int playerType, Activity mActivity, String
         return types;
     }
     
+        public static Integer[] getAvailableDefaultPlayerTypes() {
+        Integer[] types = new Integer[AVAILABLE_DEFAULT_PLAYERS.keySet().size()];
+        AVAILABLE_DEFAULT_PLAYERS.keySet().toArray(types);
+        return types;
+    }
+    
 public static String getRenderName(int renderType) {
         if (renderType == 1) {
             return "SurfaceView";
