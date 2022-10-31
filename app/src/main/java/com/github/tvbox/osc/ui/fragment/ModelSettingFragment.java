@@ -500,13 +500,16 @@ public class ModelSettingFragment extends BaseLazyFragment {
         });
         findViewById(R.id.llPlay).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+                        public void onClick(View v) {
                 FastClickCheckUtil.check(v);
                 int defaultPos = Hawk.get(HawkConfig.PLAY_TYPE, 0);
                 ArrayList<Integer> players = new ArrayList<>();
                 players.add(0);
                 players.add(1);
                 players.add(2);
+                players.add(10);
+                players.add(11);
+                players.add(12);
                 SelectDialog<Integer> dialog = new SelectDialog<>(mActivity);
                 dialog.setTip("请选择默认播放器");
                 dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<Integer>() {
