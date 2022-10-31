@@ -483,6 +483,8 @@ public class PlayerFragment  extends BaseLazyFragment {
         return newInfo;
     }
 
+    public boolean extPlay;
+
     void initPlayerCfg() {
         try {
             mVodPlayerCfg = new JSONObject(mVodInfo.playerCfg);
