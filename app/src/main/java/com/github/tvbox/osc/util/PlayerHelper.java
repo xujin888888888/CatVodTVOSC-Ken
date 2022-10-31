@@ -163,6 +163,18 @@ public class PlayerHelper {
             return "系统";
         }
     }
+    
+    public static String get3rdPlayerName(int playType) {
+        if(AVAILABLE_3RD_PLAYERS.containsKey(playType))
+            return AVAILABLE_3RD_PLAYERS.get(playType);
+        else {
+            Integer[] types = getAvailable3rdPlayerTypes();
+            if(types.length > 0)
+                return AVAILABLE_3RD_PLAYERS.get(types[0]);
+            else
+                return null;
+        }
+    }
 
     public static String getRenderName(int renderType) {
         if (renderType == 1) {
