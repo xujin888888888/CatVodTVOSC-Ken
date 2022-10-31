@@ -29,11 +29,7 @@ import xyz.doikki.videoplayer.player.VideoView;
 import xyz.doikki.videoplayer.render.RenderViewFactory;
 import xyz.doikki.videoplayer.render.TextureRenderViewFactory;
 
-    private static Map<Integer, String> AVAILABLE_DEFAULT_PLAYERS = new TreeMap<Integer, String>() {{
-        put(0, "系统");
-        put(1, "IJK");
-        put(2, "Exo");
-    }};
+    
     private static Map<Integer, String> AVAILABLE_3RD_PLAYERS = new TreeMap<Integer, String>();
 
 
@@ -172,12 +168,7 @@ public class PlayerHelper {
         }
     }
     
-        public static String getPlayerName(int playType) {
-        if(AVAILABLE_DEFAULT_PLAYERS.containsKey(playType))
-            return AVAILABLE_DEFAULT_PLAYERS.get(playType);
-        else
-            return AVAILABLE_DEFAULT_PLAYERS.get(0);
-    }
+
     
         public static void reload3rdPlayers() {
         AVAILABLE_3RD_PLAYERS.clear();
@@ -247,12 +238,6 @@ public static boolean playOn3rdPlayer(int playerType, Activity mActivity, String
     public static Integer[] getAvailable3rdPlayerTypes() {
         Integer[] types = new Integer[AVAILABLE_3RD_PLAYERS.keySet().size()];
         AVAILABLE_3RD_PLAYERS.keySet().toArray(types);
-        return types;
-    }
-
-    public static Integer[] getAvailableDefaultPlayerTypes() {
-        Integer[] types = new Integer[AVAILABLE_DEFAULT_PLAYERS.keySet().size()];
-        AVAILABLE_DEFAULT_PLAYERS.keySet().toArray(types);
         return types;
     }
 
