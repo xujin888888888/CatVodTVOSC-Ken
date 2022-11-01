@@ -189,12 +189,18 @@ public class PlayerFragment  extends BaseLazyFragment {
         mVideoView.setProgressManager(progressManager);
         mController.setListener(new VodController.VodControlListener() {
             @Override
-            public void playNext(boolean rmProgress) {
-                String preProgressKey = progressKey;
-                PlayerFragment.this.playNext();
-                if (rmProgress && preProgressKey != null)
-                    CacheManager.delete(MD5.string2MD5(preProgressKey));
+           
+                    public void playNext(boolean rmProgress) {
+                if (mVodInfo.reverseSort) {
+                    PlayFragment.this.playPrevious();
+                } else {
+                    String preProgressKey = progressKey;
+                    PlayFragment.this.playNext();
+                    if (rmProgress && preProgressKey != null)
+                        CacheManager.delete(MD5.string2MD5(preProgressKey), 0);
+                }
             }
+
 
             @Override
             public void playPre() {
@@ -569,7 +575,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         mController.setTitle(playTitleInfo);
 
         playUrl(null, null);
-        String progressKey = mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
+        
         if(vs.url.startsWith("tvbox-drive://")) {
             mController.showParse(false);
             HashMap<String, String> headers = null;
@@ -586,6 +592,16 @@ public class PlayerFragment  extends BaseLazyFragment {
             playUrl(vs.url.replace("tvbox-drive://", ""), headers);
             return;
         }
+        stopParse();
+        if (mVideoView != null) mVideoView.release();
+        String subtitleCacheKey = mVodInfo.sourceKey + "-" + mVodInfo.id + "-" + mVodInfo.playFlag + "-" + mVodInfo.playIndex+ "-" + vs.name + "-subt";
+        String progressKey = mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
+        //重新播放清除现有进度
+        if (reset) {
+            CacheManager.delete(MD5.string2MD5(progressKey), 0);
+            CacheManager.delete(MD5.string2MD5(subtitleCacheKey), "");
+        }
+        
         if (Thunder.play(vs.url, new Thunder.ThunderCallback() {
             @Override
             public void status(int code, String info) {
