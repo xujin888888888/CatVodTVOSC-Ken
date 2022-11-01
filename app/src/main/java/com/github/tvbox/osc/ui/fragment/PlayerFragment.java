@@ -45,7 +45,6 @@ import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.player.IjkMediaPlayer;
 import com.github.tvbox.osc.player.controller.VodController;
 import com.github.tvbox.osc.player.thirdparty.DangbeiPlayer;
-import com.github.tvbox.osc.player.thirdparty.Kodi;
 import com.github.tvbox.osc.player.thirdparty.MXPlayer;
 import com.github.tvbox.osc.player.thirdparty.ReexPlayer;
 import com.github.tvbox.osc.player.thirdparty.UCPlayer;
@@ -224,7 +223,6 @@ public class PlayerFragment  extends BaseLazyFragment {
                 play(replay);
             }
 
-
             @Override
             public void errReplay() {
                 errorWithRetry("视频播放出错", false);
@@ -335,32 +333,6 @@ public class PlayerFragment  extends BaseLazyFragment {
                     if (url != null) {
                         try {
                             int playerType = mVodPlayerCfg.getInt("pl");
-                        extPlay = false;
-                            if (playerType >= 10) {
-                                VodInfo.VodSeries vs = mVodInfo.seriesMap.get(mVodInfo.playFlag).get(mVodInfo.playIndex);
-                                String playTitle = mVodInfo.name + " : " + vs.name;
-                                setTip("调用外部播放器" + PlayerHelper.getPlayerName(playerType) + "进行播放", true, false);
-                                boolean callResult = false;
-                                switch (playerType) {
-                                    case 10: {
-                                        extPlay = true;
-                                        callResult = MXPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
-                                        break;
-                                    }
-                                    case 11: {
-                                        extPlay = true;
-                                        callResult = ReexPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
-                                        break;
-                                    }
-                                    case 12: {
-                                        extPlay = true;
-                                        callResult = Kodi.run(requireActivity(), url, playTitle, playSubtitle, headers);
-                                        break;
-                                    }
-                                }
-                                setTip("调用外部播放器" + PlayerHelper.getPlayerName(playerType) + (callResult ? "成功" : "失败"), callResult, !callResult);
-                                return;
-                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -481,8 +453,6 @@ public class PlayerFragment  extends BaseLazyFragment {
         return newInfo;
     }
 
-    public boolean extPlay;
-
     void initPlayerCfg() {
         try {
             mVodPlayerCfg = new JSONObject(mVodInfo.playerCfg);
@@ -579,6 +549,7 @@ public class PlayerFragment  extends BaseLazyFragment {
             return false;
         }
     }
+    
 
     public void play(boolean reset) {
         JsonObject jsonObject = new JsonObject();
