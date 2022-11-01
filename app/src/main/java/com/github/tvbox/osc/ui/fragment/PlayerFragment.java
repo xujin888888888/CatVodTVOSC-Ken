@@ -586,7 +586,6 @@ public class PlayerFragment  extends BaseLazyFragment {
             playUrl(vs.url.replace("tvbox-drive://", ""), headers);
             return;
         }
-        
         if (Thunder.play(vs.url, new Thunder.ThunderCallback() {
             @Override
             public void status(int code, String info) {
