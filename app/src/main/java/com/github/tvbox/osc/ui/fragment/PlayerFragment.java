@@ -45,6 +45,7 @@ import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.player.IjkMediaPlayer;
 import com.github.tvbox.osc.player.controller.VodController;
 import com.github.tvbox.osc.player.thirdparty.DangbeiPlayer;
+import com.github.tvbox.osc.player.thirdparty.Kodi;
 import com.github.tvbox.osc.player.thirdparty.MXPlayer;
 import com.github.tvbox.osc.player.thirdparty.ReexPlayer;
 import com.github.tvbox.osc.player.thirdparty.UCPlayer;
@@ -1134,6 +1135,8 @@ public class PlayerFragment  extends BaseLazyFragment {
             return false;
         }
     }
+    
+    public boolean extPlay;
 
     private void configWebViewSys(WebView webView) {
         if (webView == null) {
