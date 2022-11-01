@@ -193,7 +193,7 @@ public class PlayerFragment  extends BaseLazyFragment {
                 String preProgressKey = progressKey;
                 PlayerFragment.this.playNext();
                 if (rmProgress && preProgressKey != null)
-                    CacheManager.delete(MD5.string2MD5(preProgressKey));
+                    CacheManager.delete(MD5.string2MD5(preProgressKey), 0);
             }
 
             @Override
@@ -592,8 +592,8 @@ public class PlayerFragment  extends BaseLazyFragment {
         
         //重新播放清除现有进度
         if (reset) {
-            CacheManager.delete(MD5.string2MD5(progressKey));
-            CacheManager.delete(MD5.string2MD5(subtitleCacheKey));
+            CacheManager.delete(MD5.string2MD5(progressKey), 0);
+            CacheManager.delete(MD5.string2MD5(subtitleCacheKey), "");
         }
         if (Thunder.play(vs.url, new Thunder.ThunderCallback() {
             @Override
