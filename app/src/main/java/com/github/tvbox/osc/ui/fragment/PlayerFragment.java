@@ -333,6 +333,33 @@ public class PlayerFragment  extends BaseLazyFragment {
                     if (url != null) {
                         try {
                             int playerType = mVodPlayerCfg.getInt("pl");
+                        // takagen99: Check for External Player
+                            extPlay = false;
+                            if (playerType >= 10) {
+                                VodInfo.VodSeries vs = mVodInfo.seriesMap.get(mVodInfo.playFlag).get(mVodInfo.playIndex);
+                                String playTitle = mVodInfo.name + " : " + vs.name;
+                                setTip("调用外部播放器" + PlayerHelper.getPlayerName(playerType) + "进行播放", true, false);
+                                boolean callResult = false;
+                                switch (playerType) {
+                                    case 10: {
+                                        extPlay = true;
+                                        callResult = MXPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
+                                        break;
+                                    }
+                                    case 11: {
+                                        extPlay = true;
+                                        callResult = ReexPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
+                                        break;
+                                    }
+                                    case 12: {
+                                        extPlay = true;
+                                        callResult = Kodi.run(requireActivity(), url, playTitle, playSubtitle, headers);
+                                        break;
+                                    }
+                                }
+                                setTip("调用外部播放器" + PlayerHelper.getPlayerName(playerType) + (callResult ? "成功" : "失败"), callResult, !callResult);
+                                return;
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
