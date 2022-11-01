@@ -580,17 +580,46 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
     }
 
-    public void play(boolean reset) {
+public void play(boolean reset) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type", "vod-update-info");
+        jsonObject.addProperty("playFlag", mVodInfo.playFlag);
+        jsonObject.addProperty("playIndex", mVodInfo.playIndex);
+        ControlManager.get().getSocketServer().sendToAll(jsonObject);
         VodInfo.VodSeries vs = mVodInfo.seriesMap.get(mVodInfo.playFlag).get(mVodInfo.playIndex);
         EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_REFRESH, mVodInfo.playIndex));
-        setTip("正在获取播放信息", true, false);
-        String playTitleInfo = mVodInfo.name + " : " + vs.name;
+        mActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        setTip("正在获取播放信息", true, false);
+                                    }
+                                });
+        String playTitleInfo = mVodInfo.name + " " + vs.name;
         mController.setTitle(playTitleInfo);
 
+        playUrl(null, null);
+        String progressKey = mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
+        if(vs.url.startsWith("tvbox-drive://")) {
+            mController.showParse(false);
+            HashMap<String, String> headers = null;
+            if(mVodInfo.playerCfg != null && mVodInfo.playerCfg.length() > 0) {
+                JsonObject playerConfig = JsonParser.parseString(mVodInfo.playerCfg).getAsJsonObject();
+                if(playerConfig.has("headers")) {
+                    headers = new HashMap<>();
+                    for (JsonElement headerEl: playerConfig.getAsJsonArray("headers")) {
+                        JsonObject headerJson = headerEl.getAsJsonObject();
+                        headers.put(headerJson.get("name").getAsString(), headerJson.get("value").getAsString());
+                    }
+                }
+            }
+            playUrl(vs.url.replace("tvbox-drive://", ""), headers);
+            return;
+        }
         stopParse();
         if (mVideoView != null) mVideoView.release();
         String subtitleCacheKey = mVodInfo.sourceKey + "-" + mVodInfo.id + "-" + mVodInfo.playFlag + "-" + mVodInfo.playIndex+ "-" + vs.name + "-subt";
-        String progressKey = mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
+        
+        
         //重新播放清除现有进度
         if (reset) {
             CacheManager.delete(MD5.string2MD5(progressKey), 0);
@@ -599,11 +628,16 @@ public class PlayerFragment  extends BaseLazyFragment {
         if (Thunder.play(vs.url, new Thunder.ThunderCallback() {
             @Override
             public void status(int code, String info) {
-                if (code < 0) {
-                    setTip(info, false, true);
-                } else {
-                    setTip(info, true, false);
-                }
+mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (code < 0) {
+                            setTip(info, false, true);
+                        } else {
+                            setTip(info, true, false);
+                        }
+                    }
+                });
             }
 
             @Override
@@ -618,7 +652,7 @@ public class PlayerFragment  extends BaseLazyFragment {
             mController.showParse(false);
             return;
         }
-        sourceViewModel.getPlay(sourceKey, mVodInfo.playFlag, progressKey, vs.url, subtitleCacheKey);
+        sourceViewModel.getPlay(sourceKey, mVodInfo.playFlag, progressKey, vs.url);
     }
 
     private String playSubtitle;
