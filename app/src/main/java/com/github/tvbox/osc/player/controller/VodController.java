@@ -133,7 +133,6 @@ public class VodController extends BaseController {
     ImageView mPlayerRetry;
     TextView mPlayerTimeStartBtn;
     TextView mPlayerTimeSkipBtn;
-    TextView mPlayerTimeStepBtn;
     TextView loadingSpeed;
     TextView loadingSpeedRt;
     TextView tvVideoInfo;
@@ -198,7 +197,6 @@ public class VodController extends BaseController {
         mPlayerIJKBtn = findViewById(R.id.play_ijk);
         mPlayerTimeStartBtn = findViewById(R.id.play_time_start);
         mPlayerTimeSkipBtn = findViewById(R.id.play_time_end);
-        mPlayerTimeStepBtn = findViewById(R.id.play_time_step);
         loadingSpeed = findViewById(R.id.loadingSpeed);
         loadingSpeedRt = findViewById(R.id.loadingSpeedRt);
         tvVideoInfo = findViewById(R.id.tv_video_info);
@@ -446,12 +444,10 @@ public class VodController extends BaseController {
             @Override
             public void onClick(View view) {
                 try {
-                    int step = Hawk.get(HawkConfig.PLAY_TIME_STEP, 5);
-                    int st = mPlayerConfig.getInt("st");
-                    st += step;
-                    if (st > 60 * 10)
-                        st = 0;
-                    mPlayerConfig.put("st", st);
+                    int current = (int) mControlWrapper.getCurrentPosition();
+                    int duration = (int) mControlWrapper.getDuration();
+                    if (current > duration / 2) return;
+                    mPlayerConfig.put("st",current/1000);
                     updatePlayerCfgView();
                     listener.updatePlayerCfg();
                 } catch (JSONException e) {
@@ -477,12 +473,10 @@ public class VodController extends BaseController {
             @Override
             public void onClick(View view) {
                 try {
-                    int step = Hawk.get(HawkConfig.PLAY_TIME_STEP, 5);
-                    int et = mPlayerConfig.getInt("et");
-                    et += step;
-                    if (et > 60 * 10)
-                        et = 0;
-                    mPlayerConfig.put("et", et);
+                    int current = (int) mControlWrapper.getCurrentPosition();
+                    int duration = (int) mControlWrapper.getDuration();
+                    if (current < duration / 2) return;
+                    mPlayerConfig.put("et", (duration - current)/1000);
                     updatePlayerCfgView();
                     listener.updatePlayerCfg();
                 } catch (JSONException e) {
@@ -500,27 +494,6 @@ public class VodController extends BaseController {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                return true;
-            }
-        });
-
-        mPlayerTimeStepBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int step = Hawk.get(HawkConfig.PLAY_TIME_STEP, 5);
-                step += 5;
-                if (step > 30) {
-                    step = 5;
-                }
-                Hawk.put(HawkConfig.PLAY_TIME_STEP, step);
-                updatePlayerCfgView();
-            }
-        });
-        mPlayerTimeStepBtn.setOnLongClickListener(new OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Hawk.put(HawkConfig.PLAY_TIME_STEP, 5);
-                updatePlayerCfgView();
                 return true;
             }
         });
@@ -663,7 +636,7 @@ public void setPlayerConfig(JSONObject playerCfg) {
             mPlayerSpeedBtn.setText("x" + mPlayerConfig.getDouble("sp"));
             mPlayerTimeStartBtn.setText(PlayerUtils.stringForTime(mPlayerConfig.getInt("st") * 1000));
             mPlayerTimeSkipBtn.setText(PlayerUtils.stringForTime(mPlayerConfig.getInt("et") * 1000));
-            mPlayerTimeStepBtn.setText(Hawk.get(HawkConfig.PLAY_TIME_STEP, 5) + "s");
+            
             JsonObject obj = new JsonObject();
             obj.addProperty("type", "vod-update-info");
             obj.addProperty("playerCfg", mPlayerConfig.toString());
@@ -955,8 +928,6 @@ public void setPlayerConfig(JSONObject playerCfg) {
             doShowHint(mPlayerTimeStartBtn, "跳过片头", postDelay);
         } else if(focusedView == mPlayerTimeSkipBtn) {
             doShowHint(mPlayerTimeSkipBtn, "跳过片尾", postDelay);
-        } else if(focusedView == mPlayerTimeStepBtn) {
-            doShowHint(mPlayerTimeSkipBtn, "用于设置跳过片头/片尾的步速", postDelay);
         } else if(focusedView == playAudio) {
             doShowHint(playAudio, "选择音轨", postDelay);
         } else {
