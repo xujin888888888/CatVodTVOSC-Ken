@@ -191,15 +191,11 @@ public class PlayerFragment  extends BaseLazyFragment {
             @Override
            
                     public void playNext(boolean rmProgress) {
-                if (mVodInfo.reverseSort) {
-                    PlayFragment.this.playPrevious();
-                } else {
                     String preProgressKey = progressKey;
                     PlayFragment.this.playNext();
                     if (rmProgress && preProgressKey != null)
                         CacheManager.delete(MD5.string2MD5(preProgressKey), 0);
                 }
-            }
 
 
             @Override
