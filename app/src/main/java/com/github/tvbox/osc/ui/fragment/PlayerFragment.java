@@ -580,7 +580,7 @@ public class PlayerFragment  extends BaseLazyFragment {
         }
     }
 
-public void play(boolean reset) {
+    public void play(boolean reset) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type", "vod-update-info");
         jsonObject.addProperty("playFlag", mVodInfo.playFlag);
@@ -615,20 +615,10 @@ public void play(boolean reset) {
             playUrl(vs.url.replace("tvbox-drive://", ""), headers);
             return;
         }
-        stopParse();
-        if (mVideoView != null) mVideoView.release();
-        String subtitleCacheKey = mVodInfo.sourceKey + "-" + mVodInfo.id + "-" + mVodInfo.playFlag + "-" + mVodInfo.playIndex+ "-" + vs.name + "-subt";
-        
-        
-        //重新播放清除现有进度
-        if (reset) {
-            CacheManager.delete(MD5.string2MD5(progressKey), 0);
-            CacheManager.delete(MD5.string2MD5(subtitleCacheKey), "");
-        }
         if (Thunder.play(vs.url, new Thunder.ThunderCallback() {
             @Override
             public void status(int code, String info) {
-mActivity.runOnUiThread(new Runnable() {
+                mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (code < 0) {
