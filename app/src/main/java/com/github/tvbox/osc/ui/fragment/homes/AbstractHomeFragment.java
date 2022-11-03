@@ -27,6 +27,7 @@ import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
 import com.github.tvbox.osc.ui.adapter.ApiHistoryDialogAdapter;
 import com.github.tvbox.osc.ui.dialog.QRCodeDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
+import com.github.tvbox.osc.ui.dialog.ApiHistoryDialog;
 import com.github.tvbox.osc.ui.dialog.TipDialog;
 import com.github.tvbox.osc.ui.tv.QRCodeGen;
 import com.github.tvbox.osc.util.AppManager;
