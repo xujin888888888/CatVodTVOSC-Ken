@@ -133,7 +133,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 }
             });
             tvName.setOnLongClickListener(new View.OnLongClickListener() {
-                public void OnLongClickListener(View view) {
+                public boolean onLongClick(View view) {
                 ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
                 if (history.isEmpty())
                     return;
@@ -162,7 +162,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 dialog.show();
                 return true;
             }
-            });
+        });
         }
     }
 
