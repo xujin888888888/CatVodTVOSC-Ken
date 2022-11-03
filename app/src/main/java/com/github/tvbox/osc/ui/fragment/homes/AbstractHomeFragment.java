@@ -24,6 +24,7 @@ import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.ui.activity.SettingActivity;
 import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
+import com.github.tvbox.osc.ui.adapter.ApiHistoryDialogAdapter;
 import com.github.tvbox.osc.ui.dialog.QRCodeDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
 import com.github.tvbox.osc.ui.dialog.TipDialog;
@@ -143,9 +144,12 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     @Override
                     public void click(String value) {
                         Hawk.put(HawkConfig.API_URL, value);
-                        tvApi.setText(value);
-                        dialog.dismiss();
-                    }
+                          EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
+                                AppManager.getInstance().finishAllActivity();
+                                Bundle bundle = new Bundle();
+                                bundle.putBoolean("useCache", true);
+                                jumpActivity(HomeActivity.class, bundle);
+                            }
 
                     @Override
                     public void del(String value, ArrayList<String> data) {
