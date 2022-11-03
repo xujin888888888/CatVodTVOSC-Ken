@@ -2,6 +2,7 @@ package com.github.tvbox.osc.ui.fragment.homes;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -144,11 +145,13 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 dialog.setAdapter(new ApiHistoryDialogAdapter.SelectDialogInterface() {
                     @Override
                     public void click(String value) {
+                    Intent intent =new Intent(getApplicationContext(), HomeActivity.class);
                         Hawk.put(HawkConfig.API_URL, value);
                           EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
                                 AppManager.getInstance().finishAllActivity();
                                 Bundle bundle = new Bundle();
                                 bundle.putBoolean("useCache", true);
+                                intent.putExtras(bundle);
                                 jumpActivity(HomeActivity.class, bundle);
                             }
 
@@ -158,12 +161,6 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     }
                 }, history, idx);
                 dialog.show();
-                Intent intent =new Intent(getApplicationContext(), HomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("useCache", true);
-                intent.putExtras(bundle);
-                HomeActivity.this.startActivity(intent);
                 return true;
             }
         });
