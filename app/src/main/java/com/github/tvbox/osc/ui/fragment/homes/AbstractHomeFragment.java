@@ -159,8 +159,8 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     }
                 }, history, idx);
                 dialog.show();
-                dataInitOk = false;
-                jarInitOk = false;
+                dataInitOk = true;
+                jarInitOk = true;
                 return true;
             }
         });
