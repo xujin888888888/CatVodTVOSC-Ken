@@ -131,7 +131,6 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                         dialog.show();
                     }
                 }
-                );
             });
             tvName.setOnLongClickListener(new View.OnLongClickListener() {
                 public void OnLongClickListener(View view) {
@@ -163,7 +162,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 dialog.show();
                 return true;
             }
-            })
+            });
         }
     }
 
