@@ -157,7 +157,6 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                         Hawk.put(HawkConfig.API_HISTORY, data);
                     }
                 }, history, idx);
-                dialog.show();
                 return true;
             }
             });
