@@ -145,13 +145,11 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 dialog.setAdapter(new ApiHistoryDialogAdapter.SelectDialogInterface() {
                     @Override
                     public void click(String value) {
-                    Intent intent =new Intent(getApplicationContext(), HomeActivity.class);
                         Hawk.put(HawkConfig.API_URL, value);
                           EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
                                 AppManager.getInstance().finishAllActivity();
                                 Bundle bundle = new Bundle();
                                 bundle.putBoolean("useCache", true);
-                                intent.putExtras(bundle);
                                 jumpActivity(HomeActivity.class, bundle);
                             }
 
@@ -161,6 +159,8 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     }
                 }, history, idx);
                 dialog.show();
+                dataInitOk = false;
+                jarInitOk = false;
                 return true;
             }
         });
