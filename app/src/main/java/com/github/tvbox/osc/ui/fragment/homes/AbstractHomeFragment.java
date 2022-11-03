@@ -135,6 +135,8 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             tvName.setOnLongClickListener(new View.OnLongClickListener() {
                 public boolean onLongClick(View view) {
                 ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+                 String current = Hawk.get(HawkConfig.API_URL, "");
+                int idx = 0;
                 if (history.contains(current))
                     idx = history.indexOf(current);
                 ApiHistoryDialog dialog = new ApiHistoryDialog(getContext());
