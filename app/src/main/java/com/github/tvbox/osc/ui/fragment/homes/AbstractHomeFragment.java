@@ -163,7 +163,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 dialog.show();
                 return true;
             }
-            });
+            })
         }
     }
 
