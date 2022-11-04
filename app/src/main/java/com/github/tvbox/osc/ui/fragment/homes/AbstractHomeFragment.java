@@ -2,6 +2,7 @@ package com.github.tvbox.osc.ui.fragment.homes;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
+import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.base.BaseActivity;
 import com.github.tvbox.osc.base.BaseLazyFragment;
 import com.github.tvbox.osc.bean.SourceBean;
@@ -23,21 +25,27 @@ import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.activity.HomeActivity;
 import com.github.tvbox.osc.ui.activity.SettingActivity;
 import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
+import com.github.tvbox.osc.ui.adapter.ApiHistoryDialogAdapter;
 import com.github.tvbox.osc.ui.dialog.QRCodeDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
+import com.github.tvbox.osc.ui.dialog.ApiHistoryDialog;
 import com.github.tvbox.osc.ui.dialog.TipDialog;
 import com.github.tvbox.osc.ui.tv.QRCodeGen;
 import com.github.tvbox.osc.util.AppManager;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
+import com.github.tvbox.osc.util.MD5;
+import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.google.gson.JsonObject;
+import com.lzy.okgo.OkGo;
 import com.orhanobut.hawk.Hawk;
 
 import org.apache.commons.lang3.StringUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +57,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
     protected TextView tvDate;
     protected Handler mHandler = new Handler();
     protected TextView tvName;
-    protected ImageView ivQRCode;
+    //protected ImageView ivQRCode;
 
     public boolean useCacheConfig = false;
 
@@ -83,18 +91,6 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 return style;
         }
         return managedHomeFragments[0];
-    }
-
-    protected void refreshQRCode() {
-        String address = ControlManager.get().getAddress(false);
-        ivQRCode.setImageBitmap(QRCodeGen.generateBitmap(address, 100, 100));
-        ivQRCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                QRCodeDialog dialog = new QRCodeDialog(mContext);
-                dialog.show();
-            }
-        });
     }
 
     private void bindQuickApiChange() {
@@ -137,6 +133,38 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     }
                 }
             });
+            tvName.setOnLongClickListener(new View.OnLongClickListener() {
+                public boolean onLongClick(View view) {
+                ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+                 String current = Hawk.get(HawkConfig.API_URL, "");
+                int idx = 0;
+                if (history.contains(current))
+                    idx = history.indexOf(current);
+                ApiHistoryDialog dialog = new ApiHistoryDialog(getContext());
+                dialog.setTip("历史配置列表");
+                dialog.setAdapter(new ApiHistoryDialogAdapter.SelectDialogInterface() {
+                    @Override
+                    public void click(String value) {
+                        Hawk.put(HawkConfig.API_URL, value);
+                          EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
+                                AppManager.getInstance().finishAllActivity();
+                                Bundle bundle = new Bundle();
+                                bundle.putBoolean("useCache", true);
+                                jumpActivity(HomeActivity.class, bundle);
+                                initData();
+                            }
+
+                    @Override
+                    public void del(String value, ArrayList<String> data) {
+                        Hawk.put(HawkConfig.API_HISTORY, data);
+                    }
+                }, history, idx);
+                dialog.show();
+                dataInitOk = true;
+                jarInitOk = true;
+                return true;
+            }
+        });
         }
     }
 
@@ -146,7 +174,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
         public void run() {
             Date date = new Date();
             @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy年 MM月 dd日 EE hh:mm aa");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy年MM月dd日,EE hh:mm aa");
             if(tvDate != null)
                 tvDate.setText(timeFormat.format(date));
             mHandler.postDelayed(this, 1000);
@@ -158,7 +186,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
 
     protected void initData() {
         if (dataInitOk && jarInitOk) {
-            showLoading("正在加载首页数据源...");
+            doAfterApiInit();
             sourceViewModel.getSort(ApiConfig.get().getHomeSourceBean().getKey());
             if (((BaseActivity)mActivity).hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 LOG.e("有");
@@ -207,8 +235,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             }
             return;
         }
-        showLoading("正在加载索引...");
-        ApiConfig.get().loadConfig(useCacheConfig, new ApiConfig.LoadConfigCallback() {
+        ApiConfig.LoadConfigCallback configCallback = new ApiConfig.LoadConfigCallback() {
             TipDialog dialog = null;
 
             @Override
@@ -296,7 +323,30 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     }
                 });
             }
-        }, mActivity);
+        };
+        showLoading("正在加载索引...", 3000L, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                OkGo.getInstance().cancelTag("loadApi");
+                String apiUrl = Hawk.get(HawkConfig.API_URL, "");
+                if (apiUrl.isEmpty()) {
+                    dataInitOk = true;
+                    jarInitOk = true;
+                    initData();
+                    return;
+                }
+                File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/" + MD5.encode(apiUrl));
+                if (!cache.exists()) {
+                    dataInitOk = true;
+                    jarInitOk = true;
+                    initData();
+                    return;
+                }
+                useCacheConfig = true;
+                ApiConfig.get().loadConfig(useCacheConfig, configCallback, mActivity);
+            }
+        });
+        ApiConfig.get().loadConfig(useCacheConfig, configCallback, mActivity);
     }
 
     private long mExitTime = 0;
@@ -328,5 +378,14 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
         return false;
     }
 
-    public abstract boolean pressBack();
+    public boolean pressBack() {
+        if(!jarInitOk || !dataInitOk) {
+            dataInitOk = true;
+            jarInitOk = true;
+            showSuccess();
+            return false;
+        }
+        return true;
+    }
+    public abstract void doAfterApiInit();
 }
