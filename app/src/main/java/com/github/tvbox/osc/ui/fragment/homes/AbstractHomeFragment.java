@@ -151,7 +151,6 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                                 Bundle bundle = new Bundle();
                                 bundle.putBoolean("useCache", true);
                                 jumpActivity(HomeActivity.class, bundle);
-                                initData();
                             }
 
                     @Override
@@ -160,8 +159,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     }
                 }, history, idx);
                 dialog.show();
-                dataInitOk = true;
-                jarInitOk = true;
+                initData();
                 return true;
             }
         });
