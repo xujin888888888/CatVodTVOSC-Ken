@@ -159,7 +159,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     }
                 }, history, idx);
                 dialog.show();
-      
+      EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
                 return true;
             }
         });
