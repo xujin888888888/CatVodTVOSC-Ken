@@ -508,8 +508,8 @@ public class ApiConfig {
                 }
             }
         }
-        //        // IJK解码配置
-        if(ijkCodes==null){
+        // IJK解码配置
+                if(ijkCodes==null){
             ijkCodes = new ArrayList<>();
             boolean foundOldSelect = false;
             String ijkCodec = Hawk.get(HawkConfig.IJK_CODEC, "");
@@ -539,6 +539,8 @@ public class ApiConfig {
                 ijkCodes.get(0).selected(true);
             }
         }
+        //背景请求地址
+        this.requestBackgroundUrl = DefaultConfig.safeJsonString(infoJson, "wallpaper", null);
     }
 
     public void loadLives(JsonArray livesArray) {
@@ -585,11 +587,6 @@ public class ApiConfig {
         }
     }
 
-        //背景请求地址
-        this.requestBackgroundUrl = DefaultConfig.safeJsonString(infoJson, "wallpaper", null);
-    }
-
-    
     public String getSpider() {
         return spiders.get(getHomeSourceBean().getSpider());
     }
