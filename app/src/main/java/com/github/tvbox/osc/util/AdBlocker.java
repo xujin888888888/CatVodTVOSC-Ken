@@ -9,9 +9,7 @@ import java.util.List;
 public class AdBlocker {
     private static final List<String> AD_HOSTS = new ArrayList<>();
     
-    public class AdBlocker {
-    private static final List<String> AD_HOSTS = new ArrayList<>();
-
+    
     public static void clear() {
         AD_HOSTS.clear();
     }
