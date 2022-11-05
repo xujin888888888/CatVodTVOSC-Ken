@@ -5,9 +5,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.IntEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -52,6 +54,7 @@ import com.github.tvbox.osc.util.EpgUtil;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
+import com.github.tvbox.osc.util.live.TxtSubscribe;
 import com.github.tvbox.osc.util.PIPHelper;
 import com.github.tvbox.osc.util.urlhttp.CallBackUtil;
 import com.github.tvbox.osc.util.urlhttp.UrlHttpUtil;
@@ -81,6 +84,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -1267,6 +1271,15 @@ public class LivePlayActivity extends BaseActivity {
 
     //加载列表
     public void loadProxyLives(String url) {
+        try {
+            Uri parsedUrl = Uri.parse(url);
+            url = new String(Base64.decode(parsedUrl.getQueryParameter("ext"), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP), "UTF-8");
+        } catch (Throwable th) {
+            Toast.makeText(App.getInstance(), "频道列表为空", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        showLoading();
         OkGo.<String>get(url).execute(new AbsCallback<String>() {
 
             @Override
@@ -1276,7 +1289,11 @@ public class LivePlayActivity extends BaseActivity {
 
             @Override
             public void onSuccess(Response<String> response) {
-                JsonArray livesArray = new Gson().fromJson(response.body(), JsonArray.class);
+                JsonArray livesArray;
+                LinkedHashMap<String, LinkedHashMap<String, ArrayList<String>>> linkedHashMap = new LinkedHashMap<>();
+                TxtSubscribe.parse(linkedHashMap, response.body());
+                livesArray = TxtSubscribe.live2JsonArray(linkedHashMap);
+
                 ApiConfig.get().loadLives(livesArray);
                 List<LiveChannelGroup> list = ApiConfig.get().getChannelGroupList();
                 if (list.isEmpty()) {
@@ -1297,6 +1314,7 @@ public class LivePlayActivity extends BaseActivity {
             }
         });
     }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refresh(RefreshEvent event) {
