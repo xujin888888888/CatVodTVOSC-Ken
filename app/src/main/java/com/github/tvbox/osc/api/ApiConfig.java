@@ -508,37 +508,37 @@ public class ApiConfig {
                 }
             }
         }
-        // IJK解码配置
-        boolean foundOldSelect = false;
-        String ijkCodec = Hawk.get(HawkConfig.IJK_CODEC, "");
-        ijkCodes = new ArrayList<>();
-        for (JsonElement opt : infoJson.get("ijk").getAsJsonArray()) {
-            JsonObject obj = (JsonObject) opt;
-            String name = obj.get("group").getAsString();
-            LinkedHashMap<String, String> baseOpt = new LinkedHashMap<>();
-            for (JsonElement cfg : obj.get("options").getAsJsonArray()) {
-                JsonObject cObj = (JsonObject) cfg;
-                String key = cObj.get("category").getAsString() + "|" + cObj.get("name").getAsString();
-                String val = cObj.get("value").getAsString();
-                baseOpt.put(key, val);
+        //        // IJK解码配置
+        if(ijkCodes==null){
+            ijkCodes = new ArrayList<>();
+            boolean foundOldSelect = false;
+            String ijkCodec = Hawk.get(HawkConfig.IJK_CODEC, "");
+            for (JsonElement opt : defaultJson.get("ijk").getAsJsonArray()) {
+                JsonObject obj = (JsonObject) opt;
+                String name = obj.get("group").getAsString();
+                LinkedHashMap<String, String> baseOpt = new LinkedHashMap<>();
+                for (JsonElement cfg : obj.get("options").getAsJsonArray()) {
+                    JsonObject cObj = (JsonObject) cfg;
+                    String key = cObj.get("category").getAsString() + "|" + cObj.get("name").getAsString();
+                    String val = cObj.get("value").getAsString();
+                    baseOpt.put(key, val);
+                }
+                IJKCode codec = new IJKCode();
+                codec.setName(name);
+                codec.setOption(baseOpt);
+                if (name.equals(ijkCodec) || TextUtils.isEmpty(ijkCodec)) {
+                    codec.selected(true);
+                    ijkCodec = name;
+                    foundOldSelect = true;
+                } else {
+                    codec.selected(false);
+                }
+                ijkCodes.add(codec);
             }
-            IJKCode codec = new IJKCode();
-            codec.setName(name);
-            codec.setOption(baseOpt);
-            if (name.equals(ijkCodec) || TextUtils.isEmpty(ijkCodec)) {
-                codec.selected(true);
-                ijkCodec = name;
-                foundOldSelect = true;
-            } else {
-                codec.selected(false);
+            if (!foundOldSelect && ijkCodes.size() > 0) {
+                ijkCodes.get(0).selected(true);
             }
-            ijkCodes.add(codec);
         }
-        if (!foundOldSelect && ijkCodes.size() > 0) {
-            ijkCodes.get(0).selected(true);
-        }
-        //背景请求地址
-        this.requestBackgroundUrl = DefaultConfig.safeJsonString(infoJson, "wallpaper", null);
     }
 
     public void loadLives(JsonArray livesArray) {
@@ -585,6 +585,11 @@ public class ApiConfig {
         }
     }
 
+        //背景请求地址
+        this.requestBackgroundUrl = DefaultConfig.safeJsonString(infoJson, "wallpaper", null);
+    }
+
+    
     public String getSpider() {
         return spiders.get(getHomeSourceBean().getSpider());
     }
