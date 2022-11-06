@@ -159,12 +159,11 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     }
                 }, history, idx);
                 dialog.show();
-      ApiConfig.get().setSourceBean(value);
-                                EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
-                                AppManager.getInstance().finishAllActivity();
-                                Bundle bundle = new Bundle();
-                                bundle.putBoolean("useCache", true);
-                                jumpActivity(HomeActivity.class, bundle);
+                EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
+                AppManager.getInstance().finishAllActivity();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("useCache", true);
+                jumpActivity(HomeActivity.class, bundle);
                 return true;
             }
         });
