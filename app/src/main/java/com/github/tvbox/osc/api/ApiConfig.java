@@ -208,7 +208,7 @@ public class ApiConfig {
                         if (response.body() == null) {
                             result = "";
                         } else {
-                            FindResult(response.body().string(), configKey);
+                            result = response.body().string();
                         }
                         if (finalApiUrl.startsWith("clan")) {
                             result = clanContentFix(clanToAddress(finalApiUrl), result);
@@ -409,7 +409,7 @@ public class ApiConfig {
         // 直播源
         liveChannelGroupList.clear();           //修复从后台切换重复加载频道列表
         try {
-            String lives = infoJson.get("lives").getAsJsonArray().get(0).getAsJsonObject().toString();
+            String lives = infoJson.get("lives").getAsJsonArray().toString();
             int index = lives.indexOf("proxy://");
             if (index != -1) {
                 int endIndex = lives.lastIndexOf("\"");
@@ -437,73 +437,28 @@ public class ApiConfig {
                 liveChannelGroup.setGroupName(url);
                 liveChannelGroupList.add(liveChannelGroup);
             } else {
-                    if(!lives.contains("type")){
-                    loadLives(infoJson.get("lives").getAsJsonArray());
-                }else {
-                    JsonObject fengMiLives = infoJson.get("lives").getAsJsonArray().get(0).getAsJsonObject();
-                    String type=fengMiLives.get("type").getAsString();
-                    if(type.equals("0")){
-                        String url =fengMiLives.get("url").getAsString();
-                        if(url.startsWith("http")){
-                            url = Base64.encodeToString(url.getBytes("UTF-8"), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP);
-                        }
-                        url ="http://127.0.0.1:9978/proxy?do=live&type=txt&ext="+url;
-                        LiveChannelGroup liveChannelGroup = new LiveChannelGroup();
-                        liveChannelGroup.setGroupName(url);
-                        liveChannelGroupList.add(liveChannelGroup);
-                    }
-                }
+                loadLives(infoJson.get("lives").getAsJsonArray());
             }
         } catch (Throwable th) {
             th.printStackTrace();
         }
-        //video parse rule for host
+                //video parse rule for host
         if (infoJson.has("rules")) {
-            VideoParseRuler.clearRule();
             for(JsonElement oneHostRule : infoJson.getAsJsonArray("rules")) {
                 JsonObject obj = (JsonObject) oneHostRule;
                 String host = obj.get("host").getAsString();
-                if (obj.has("rule")) {
-                    JsonArray ruleJsonArr = obj.getAsJsonArray("rule");
-                    ArrayList<String> rule = new ArrayList<>();
-                    for(JsonElement one : ruleJsonArr) {
-                        String oneRule = one.getAsString();
-                        rule.add(oneRule);
-                    }
-                    if (rule.size() > 0) {
-                        VideoParseRuler.addHostRule(host, rule);
-                    }
+                JsonArray ruleJsonArr = obj.getAsJsonArray("rule");
+                ArrayList<String> rule = new ArrayList<>();
+                for(JsonElement one : ruleJsonArr) {
+                    String oneRule = one.getAsString();
+                    rule.add(oneRule);
                 }
-                if (obj.has("filter")) {
-                    JsonArray filterJsonArr = obj.getAsJsonArray("filter");
-                    ArrayList<String> filter = new ArrayList<>();
-                    for(JsonElement one : filterJsonArr) {
-                        String oneFilter = one.getAsString();
-                        filter.add(oneFilter);
-                    }
-                    if (filter.size() > 0) {
-                        VideoParseRuler.addHostFilter(host, filter);
-                    }
-                }
+                VideoParseRuler.addHostRule(host, rule);
             }
         }
-
-        String defaultIJKADS="{\"ijk\":[{\"options\":[{\"name\":\"opensles\",\"category\":4,\"value\":\"0\"},{\"name\":\"overlay-format\",\"category\":4,\"value\":\"842225234\"},{\"name\":\"framedrop\",\"category\":4,\"value\":\"1\"},{\"name\":\"soundtouch\",\"category\":4,\"value\":\"1\"},{\"name\":\"start-on-prepared\",\"category\":4,\"value\":\"1\"},{\"name\":\"http-detect-rangeupport\",\"category\":1,\"value\":\"0\"},{\"name\":\"fflags\",\"category\":1,\"value\":\"fastseek\"},{\"name\":\"skip_loop_filter\",\"category\":2,\"value\":\"48\"},{\"name\":\"reconnect\",\"category\":4,\"value\":\"1\"},{\"name\":\"enable-accurateeek\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec-auto-rotate\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec-handle-resolution-change\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec-hevc\",\"category\":4,\"value\":\"0\"},{\"name\":\"dns_cache_timeout\",\"category\":1,\"value\":\"600000000\"}],\"group\":\"软解码\"},{\"options\":[{\"name\":\"opensles\",\"category\":4,\"value\":\"0\"},{\"name\":\"overlay-format\",\"category\":4,\"value\":\"842225234\"},{\"name\":\"framedrop\",\"category\":4,\"value\":\"1\"},{\"name\":\"soundtouch\",\"category\":4,\"value\":\"1\"},{\"name\":\"start-on-prepared\",\"category\":4,\"value\":\"1\"},{\"name\":\"http-detect-rangeupport\",\"category\":1,\"value\":\"0\"},{\"name\":\"fflags\",\"category\":1,\"value\":\"fastseek\"},{\"name\":\"skip_loop_filter\",\"category\":2,\"value\":\"48\"},{\"name\":\"reconnect\",\"category\":4,\"value\":\"1\"},{\"name\":\"enable-accurateeek\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec\",\"category\":4,\"value\":\"1\"},{\"name\":\"mediacodec-auto-rotate\",\"category\":4,\"value\":\"1\"},{\"name\":\"mediacodec-handle-resolution-change\",\"category\":4,\"value\":\"1\"},{\"name\":\"mediacodec-hevc\",\"category\":4,\"value\":\"1\"},{\"name\":\"dns_cache_timeout\",\"category\":1,\"value\":\"600000000\"}],\"group\":\"硬解码\"}],\"ads\":[\"mimg.0c1q0l.cn\",\"www.googletagmanager.com\",\"www.google-analytics.com\",\"mc.usihnbcq.cn\",\"mg.g1mm3d.cn\",\"mscs.svaeuzh.cn\",\"cnzz.hhttm.top\",\"tp.vinuxhome.com\",\"cnzz.mmstat.com\",\"www.baihuillq.com\",\"s23.cnzz.com\",\"z3.cnzz.com\",\"c.cnzz.com\",\"stj.v1vo.top\",\"z12.cnzz.com\",\"img.mosflower.cn\",\"tips.gamevvip.com\",\"ehwe.yhdtns.com\",\"xdn.cqqc3.com\",\"www.jixunkyy.cn\",\"sp.chemacid.cn\",\"hm.baidu.com\",\"s9.cnzz.com\",\"z6.cnzz.com\",\"um.cavuc.com\",\"mav.mavuz.com\",\"wofwk.aoidf3.com\",\"z5.cnzz.com\",\"xc.hubeijieshikj.cn\",\"tj.tianwenhu.com\",\"xg.gars57.cn\",\"k.jinxiuzhilv.com\",\"cdn.bootcss.com\",\"ppl.xunzhuo123.com\",\"xomk.jiangjunmh.top\",\"img.xunzhuo123.com\",\"z1.cnzz.com\",\"s13.cnzz.com\",\"xg.huataisangao.cn\",\"z7.cnzz.com\",\"xg.huataisangao.cn\",\"z2.cnzz.com\",\"s96.cnzz.com\",\"q11.cnzz.com\",\"thy.dacedsfa.cn\",\"xg.whsbpw.cn\",\"s19.cnzz.com\",\"z8.cnzz.com\",\"s4.cnzz.com\",\"f5w.as12df.top\",\"ae01.alicdn.com\",\"www.92424.cn\",\"k.wudejia.com\",\"vivovip.mmszxc.top\",\"qiu.xixiqiu.com\",\"cdnjs.hnfenxun.com\",\"cms.qdwght.com\"]}";
-        JsonObject defaultJson=new Gson().fromJson(defaultIJKADS, JsonObject.class);
         // 广告地址
-        if(AdBlocker.isEmpty()){
-//            AdBlocker.clear();
-            //追加的广告拦截
-            if(infoJson.has("ads")){
-                for (JsonElement host : infoJson.getAsJsonArray("ads")) {
-                    AdBlocker.addAdHost(host.getAsString());
-                }
-            }else {
-                //默认广告拦截
-                for (JsonElement host : defaultJson.getAsJsonArray("ads")) {
-                    AdBlocker.addAdHost(host.getAsString());
-                }
-            }
+        for (JsonElement host : infoJson.getAsJsonArray("ads")) {
+            AdBlocker.addAdHost(host.getAsString());
         }
         // IJK解码配置
         boolean foundOldSelect = false;
