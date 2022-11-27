@@ -7,6 +7,8 @@ import android.util.Base64;
 
 import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.Spider;
+import com.github.catvod.crawler.SpiderNull;
+import com.undcover.freedom.pyramid.PythonLoader;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.bean.LiveChannelGroup;
 import com.github.tvbox.osc.bean.IJKCode;
@@ -66,6 +68,8 @@ public class ApiConfig {
     private SourceBean emptyHome = new SourceBean();
 
     private JarLoader jarLoader = new JarLoader();
+    
+    private Map<String, JarLoader> jarLoaders = new HashMap<>();
 
     private String userAgent = "okhttp/3.15";
 
@@ -221,6 +225,24 @@ public class ApiConfig {
                         return result;
                     }
                 });
+    }
+    
+    private void loadOtherJars() {
+        for (String spiderKey : spiders.keySet()) {
+            if(jarLoaders.containsKey(spiderKey))
+                continue;
+            System.out.println("正在载入更多爬虫代码..." + spiderKey);
+            loadJar(true, spiderKey, spiders.get(spiderKey), new LoadConfigCallback() {
+                @Override
+                public void success() { }
+
+                @Override
+                public void retry() { }
+
+                @Override
+                public void error(String msg) { }
+            });
+        }
     }
 
 
