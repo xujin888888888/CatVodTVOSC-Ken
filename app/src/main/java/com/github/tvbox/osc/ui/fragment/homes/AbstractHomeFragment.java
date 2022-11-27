@@ -149,7 +149,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             }, sites, sites.indexOf(ApiConfig.get().getHomeSourceBean()));
             dialog.show();
         }
-    };
+    }
             tvName.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
