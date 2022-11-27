@@ -354,7 +354,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
         return true;
     }
     public abstract void doAfterApiInit();
-}
+
 
 @Override
     protected void onDestroy() {
@@ -407,3 +407,4 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             dialog.show();
         }
     }
+}
