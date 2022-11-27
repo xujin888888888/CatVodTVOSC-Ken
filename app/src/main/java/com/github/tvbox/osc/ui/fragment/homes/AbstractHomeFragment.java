@@ -99,71 +99,20 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             tvName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    List<SourceBean> sites = ApiConfig.get().getSourceBeanList();
-                    if (sites.size() > 0) {
-                        SelectDialog<SourceBean> dialog = new SelectDialog<>(mActivity);
-                        dialog.setTip("请选择首页数据源");
-                        dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<SourceBean>() {
-                            @Override
-                            public void click(SourceBean value, int pos) {
-                                ApiConfig.get().setSourceBean(value);
-                                EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
-                                AppManager.getInstance().finishAllActivity();
-                                Bundle bundle = new Bundle();
-                                bundle.putBoolean("useCache", true);
-                                jumpActivity(HomeActivity.class, bundle);
-                            }
-
-                            @Override
-                            public String getDisplay(SourceBean val) {
-                                return val.getName();
-                            }
-                        }, new DiffUtil.ItemCallback<SourceBean>() {
-                            @Override
-                            public boolean areItemsTheSame(@NonNull @NotNull SourceBean oldItem, @NonNull @NotNull SourceBean newItem) {
-                                return oldItem == newItem;
-                            }
-
-                            @Override
-                            public boolean areContentsTheSame(@NonNull @NotNull SourceBean oldItem, @NonNull @NotNull SourceBean newItem) {
-                                return oldItem.getKey().equals(newItem.getKey());
-                            }
-                        }, sites, sites.indexOf(ApiConfig.get().getHomeSourceBean()));
-                        dialog.show();
-                    }
-                }
-            });
+                dataInitOk = false;
+                jarInitOk = true;
+                showSiteSwitch();
+            }
+        });
             tvName.setOnLongClickListener(new View.OnLongClickListener() {
-                public boolean onLongClick(View view) {
-                ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
-                 String current = Hawk.get(HawkConfig.API_URL, "");
-                int idx = 0;
-                if (history.contains(current))
-                    idx = history.indexOf(current);
-                ApiHistoryDialog dialog = new ApiHistoryDialog(getContext());
-                dialog.setTip("历史配置列表");
-                dialog.setAdapter(new ApiHistoryDialogAdapter.SelectDialogInterface() {
-                    @Override
-                    public void click(String value) {
-                        Hawk.put(HawkConfig.API_URL, value);
-                          EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
-                                AppManager.getInstance().finishAllActivity();
-                                Bundle bundle = new Bundle();
-                                bundle.putBoolean("useCache", true);
-                                jumpActivity(HomeActivity.class, bundle);
-                            }
-
-                    @Override
-                    public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.API_HISTORY, data);
-                    }
-                }, history, idx);
-                dialog.show();
-                EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
-                AppManager.getInstance().finishAllActivity();
+            @Override
+            public boolean onLongClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("useCache", true);
-                jumpActivity(HomeActivity.class, bundle);
+                intent.putExtras(bundle);
+                HomeActivity.this.startActivity(intent);
                 return true;
             }
         });
@@ -360,6 +309,24 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
         }
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void refresh(RefreshEvent event) {
+        if (event.type == RefreshEvent.TYPE_PUSH_URL) {
+            if (ApiConfig.get().getSource("push_agent") != null) {
+                Intent newIntent = new Intent(mContext, DetailActivity.class);
+                newIntent.putExtra("id", (String) event.obj);
+                newIntent.putExtra("sourceKey", "push_agent");
+                newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                HomeActivity.this.startActivity(newIntent);
+            }
+        } else if (event.type == RefreshEvent.TYPE_FILTER_CHANGE) {
+            if (currentView != null) {
+                showFilterIcon((int) event.obj);
+            }
+        }
+    }
+
     public void updateScreenTime() {
         mHandler.post(mRunnable);
     }
@@ -388,3 +355,55 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
     }
     public abstract void doAfterApiInit();
 }
+
+@Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+        AppManager.getInstance().appExit(0);
+        ControlManager.get().stopServer();
+    }
+
+    void showSiteSwitch() {
+        List<SourceBean> sites = ApiConfig.get().getSourceBeanList();
+        if (sites.size() > 0) {
+            SelectDialog<SourceBean> dialog = new SelectDialog<>(HomeActivity.this);
+            TvRecyclerView tvRecyclerView = dialog.findViewById(R.id.list);
+            int spanCount;
+            spanCount = (int)Math.floor(sites.size()/60);
+            spanCount = Math.min(spanCount, 2);
+            tvRecyclerView.setLayoutManager(new V7GridLayoutManager(dialog.getContext(), spanCount+1));
+            ConstraintLayout cl_root = dialog.findViewById(R.id.cl_root);
+            ViewGroup.LayoutParams clp = cl_root.getLayoutParams();
+            clp.width = AutoSizeUtils.mm2px(dialog.getContext(), 380+200*spanCount);
+            dialog.setTip("请选择首页数据源");
+            dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<SourceBean>() {
+                @Override
+                public void click(SourceBean value, int pos) {
+                    ApiConfig.get().setSourceBean(value);
+                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("useCache", true);
+                    intent.putExtras(bundle);
+                    HomeActivity.this.startActivity(intent);
+                }
+
+                @Override
+                public String getDisplay(SourceBean val) {
+                    return val.getName();
+                }
+            }, new DiffUtil.ItemCallback<SourceBean>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull @NotNull SourceBean oldItem, @NonNull @NotNull SourceBean newItem) {
+                    return oldItem == newItem;
+                }
+
+                @Override
+                public boolean areContentsTheSame(@NonNull @NotNull SourceBean oldItem, @NonNull @NotNull SourceBean newItem) {
+                    return oldItem.getKey().equals(newItem.getKey());
+                }
+            }, sites, sites.indexOf(ApiConfig.get().getHomeSourceBean()));
+            dialog.show();
+        }
+    }
