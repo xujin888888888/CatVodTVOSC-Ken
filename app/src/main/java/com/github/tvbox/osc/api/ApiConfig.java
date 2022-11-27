@@ -72,7 +72,7 @@ public class ApiConfig {
     private String requestAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 
 
-    private Map<String, JarLoader> jarLoaders = new HashMap<>();
+    private JarLoader jarLoader = new JarLoader();
 
 
     private ApiConfig() {
@@ -116,6 +116,16 @@ public class ApiConfig {
             e.printStackTrace();
         }
         return json;
+    }
+    
+    private static byte[] getImgJar(String body){
+        Pattern pattern = Pattern.compile("[A-Za-z0]{8}\\*\\*");
+        Matcher matcher = pattern.matcher(body);
+        if(matcher.find()){
+            body = body.substring(body.indexOf(matcher.group()) + 10);
+            return Base64.decode(body, Base64.DEFAULT);
+        }
+        return "".getBytes();
     }
 
     public void loadConfig(boolean useCache, LoadConfigCallback callback, Activity activity) {
@@ -237,33 +247,28 @@ public class ApiConfig {
             });
         }
     }
-
-    public void loadJar(boolean useCache, String spiderKey, String spider, LoadConfigCallback callback) {
+    public void loadJar(boolean useCache, String spider, LoadConfigCallback callback) {
         String[] urls = spider.split(";md5;");
         String jarUrl = urls[0];
         String md5 = urls.length > 1 ? urls[1].trim() : "";
-        File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/csp_" + spiderKey + ".jar");
+        File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/csp.jar");
 
         if (!md5.isEmpty() || useCache) {
             if (cache.exists() && (useCache || MD5.getFileMd5(cache).equalsIgnoreCase(md5))) {
-                if(jarLoaders.containsKey(spiderKey)) {
-                    callback.success();
-                    return;
-                }
-                JarLoader jarLoader = new JarLoader(spiderKey);
                 if (jarLoader.load(cache.getAbsolutePath())) {
-                    jarLoaders.put(spiderKey, jarLoader);
                     callback.success();
-                    loadOtherJars();
                 } else {
                     callback.error("");
                 }
                 return;
             }
         }
+
         boolean isJarInImg = jarUrl.startsWith("img+");
         jarUrl = jarUrl.replace("img+", "");
-        OkGo.<File>get(jarUrl).execute(new AbsCallback<File>() {
+        OkGo.<File>get(jarUrl)
+                .headers("User-Agent", userAgent)
+                .headers("Accept", requestAccept)
 
             @Override
             public File convertResponse(okhttp3.Response response) throws Throwable {
@@ -277,6 +282,11 @@ public class ApiConfig {
                     String respData = response.body().string();
                     byte[] decodedSpider = ConfigUtil.decodeSpider(respData);
                     fos.write(decodedSpider);
+                } else {
+                    if(isJarInImg) {
+                    String respData = response.body().string();
+                    byte[] imgJar = getImgJar(respData);
+                    fos.write(imgJar);
                 } else {
                     fos.write(response.body().bytes());
                 }
