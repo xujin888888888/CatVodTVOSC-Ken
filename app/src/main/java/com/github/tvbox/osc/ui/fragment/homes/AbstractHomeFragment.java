@@ -202,10 +202,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             showLoading("正在加载自定义设置...");
             if (!StringUtils.isEmpty(ApiConfig.get().getSpider())) {
                 showLoading("正在加载自定义爬虫代码...");
-                ApiConfig.get().loadJar(useCacheConfig,
-                        ApiConfig.get().getHomeSourceBean().getSpider(),
-                        ApiConfig.get().getSpider(),
-                        new ApiConfig.LoadConfigCallback() {
+                ApiConfig.get().loadJar(useCacheConfig, ApiConfig.get().getSpider(), new ApiConfig.LoadConfigCallback() {
                     @Override
                     public void success() {
                         jarInitOk = true;
