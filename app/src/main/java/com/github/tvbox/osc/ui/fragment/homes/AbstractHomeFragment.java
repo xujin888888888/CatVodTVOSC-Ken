@@ -119,8 +119,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("useCache", true);
-                intent.putExtras(bundle);
-                jumpActivity(HomeActivity.class, intent);
+                jumpActivity(HomeActivity.class, bundle);
                 return true;
             }
         });
@@ -316,24 +315,6 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             return false;
         }
     }
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void refresh(RefreshEvent event) {
-        if (event.type == RefreshEvent.TYPE_PUSH_URL) {
-            if (ApiConfig.get().getSource("push_agent") != null) {
-                EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
-                newIntent.putExtra("id", (String) event.obj);
-                newIntent.putExtra("sourceKey", "push_agent");
-                newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                jumpActivity(HomeActivity.class,newIntent);
-            }
-        } else if (event.type == RefreshEvent.TYPE_FILTER_CHANGE) {
-            if (currentView != null) {
-                showFilterIcon((int) event.obj);
-            }
-        }
-    }
     
     private void showFilterIcon(int count) {
         boolean visible = count > 0;
@@ -391,8 +372,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                     EventBus.getDefault().post(new RefreshEvent(RefreshEvent.HOME_BEAN_QUICK_CHANGE, true));
                     Bundle bundle = new Bundle();
                     bundle.putBoolean("useCache", true);
-                    intent.putExtras(bundle);
-                    jumpActivity(HomeActivity.class, intent);
+                    jumpActivity(HomeActivity.class, bundle);
                 }
 
                 @Override
