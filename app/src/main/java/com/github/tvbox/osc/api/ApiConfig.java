@@ -71,8 +71,10 @@ public class ApiConfig {
 
     private String requestAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 
-
     private JarLoader jarLoader = new JarLoader();
+
+    private Map<String, JarLoader> jarLoaders = new HashMap<>();
+
 
 
     private ApiConfig() {
@@ -280,11 +282,6 @@ public class ApiConfig {
                 FileOutputStream fos = new FileOutputStream(cache);
                 if(isJarInImg) {
                     String respData = response.body().string();
-                    byte[] decodedSpider = ConfigUtil.decodeSpider(respData);
-                    fos.write(decodedSpider);
-                } else {
-                    if(isJarInImg) {
-                    String respData = response.body().string();
                     byte[] imgJar = getImgJar(respData);
                     fos.write(imgJar);
                 } else {
@@ -294,15 +291,11 @@ public class ApiConfig {
                 fos.close();
                 return cache;
             }
-
-            @Override
+@Override
             public void onSuccess(Response<File> response) {
                 if (response.body().exists()) {
-                    JarLoader jarLoader = new JarLoader(spiderKey);
                     if (jarLoader.load(response.body().getAbsolutePath())) {
-                        jarLoaders.put(spiderKey, jarLoader);
                         callback.success();
-                        loadOtherJars();
                     } else {
                         callback.error("");
                     }
