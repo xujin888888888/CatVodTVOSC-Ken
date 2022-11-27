@@ -65,6 +65,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
     protected TextView tvDate;
     protected Handler mHandler = new Handler();
     protected TextView tvName;
+    private View currentView;
     //protected ImageView ivQRCode;
 
     public boolean useCacheConfig = false;
@@ -333,6 +334,12 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 showFilterIcon((int) event.obj);
             }
         }
+    }
+    
+    private void showFilterIcon(int count) {
+        boolean visible = count > 0;
+        currentView.findViewById(R.id.tvFilterColor).setVisibility(visible ? View.VISIBLE : View.GONE);
+        currentView.findViewById(R.id.tvFilter).setVisibility(visible ? View.GONE : View.VISIBLE);
     }
 
     public void updateScreenTime() {
