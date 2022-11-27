@@ -3,7 +3,6 @@ package com.github.tvbox.osc.ui.fragment.homes;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.github.tvbox.osc.R;
@@ -116,12 +116,12 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             tvName.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                Intent intent = new Intent(getApplicationContext(), mActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("useCache", true);
                 intent.putExtras(bundle);
-                HomeActivity.this.startActivity(intent);
+                mActivity.startActivity(intent);
                 return true;
             }
         });
@@ -323,11 +323,11 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
     public void refresh(RefreshEvent event) {
         if (event.type == RefreshEvent.TYPE_PUSH_URL) {
             if (ApiConfig.get().getSource("push_agent") != null) {
-                Intent newIntent = new Intent(mContext, DetailActivity.class);
+                Intent newIntent = new Intent(mContext, mActivity.class);
                 newIntent.putExtra("id", (String) event.obj);
                 newIntent.putExtra("sourceKey", "push_agent");
                 newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                HomeActivity.this.startActivity(newIntent);
+                mActivity..startActivity(newIntent);
             }
         } else if (event.type == RefreshEvent.TYPE_FILTER_CHANGE) {
             if (currentView != null) {
@@ -375,7 +375,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
     protected  void showSiteSwitch() {
         List<SourceBean> sites = ApiConfig.get().getSourceBeanList();
         if (sites.size() > 0) {
-            SelectDialog<SourceBean> dialog = new SelectDialog<>(HomeActivity.this);
+            SelectDialog<SourceBean> dialog = new SelectDialog<>(mActivity);
             TvRecyclerView tvRecyclerView = dialog.findViewById(R.id.list);
             int spanCount;
             spanCount = (int)Math.floor(sites.size()/60);
@@ -389,12 +389,12 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
                 @Override
                 public void click(SourceBean value, int pos) {
                     ApiConfig.get().setSourceBean(value);
-                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), mActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     Bundle bundle = new Bundle();
                     bundle.putBoolean("useCache", true);
                     intent.putExtras(bundle);
-                    HomeActivity.this.startActivity(intent);
+                    mActivity.startActivity(intent);
                 }
 
                 @Override
