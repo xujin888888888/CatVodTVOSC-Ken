@@ -150,6 +150,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
             dialog.show();
         }
     }
+    });
             tvName.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
