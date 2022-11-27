@@ -616,6 +616,7 @@ public class ApiConfig {
 
     public void setRequestBackgroundUrl(String requestBackgroundUrl) {
         this.requestBackgroundUrl = requestBackgroundUrl;
+        }
 
     public interface LoadConfigCallback {
         void success();
