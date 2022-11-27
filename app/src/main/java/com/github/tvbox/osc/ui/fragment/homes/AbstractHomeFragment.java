@@ -3,10 +3,12 @@ package com.github.tvbox.osc.ui.fragment.homes;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +42,9 @@ import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.google.gson.JsonObject;
 import com.lzy.okgo.OkGo;
 import com.orhanobut.hawk.Hawk;
+import com.owen.tvrecyclerview.widget.TvRecyclerView;
+import com.owen.tvrecyclerview.widget.V7GridLayoutManager;
+import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.greenrobot.eventbus.EventBus;
@@ -52,6 +57,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import me.jessyan.autosize.utils.AutoSizeUtils;
 
 public abstract class AbstractHomeFragment extends BaseLazyFragment {
 
@@ -359,14 +365,7 @@ public abstract class AbstractHomeFragment extends BaseLazyFragment {
 
 
 @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-        AppManager.getInstance().appExit(0);
-        ControlManager.get().stopServer();
-    }
-
-    void showSiteSwitch() {
+    protected  void showSiteSwitch() {
         List<SourceBean> sites = ApiConfig.get().getSourceBeanList();
         if (sites.size() > 0) {
             SelectDialog<SourceBean> dialog = new SelectDialog<>(HomeActivity.this);
