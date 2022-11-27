@@ -63,13 +63,9 @@ public class ApiConfig {
     private String spider = null;
     private String requestBackgroundUrl = null;
 
-    public String wallpaper = "";
-
     private SourceBean emptyHome = new SourceBean();
 
     private JarLoader jarLoader = new JarLoader();
-    
-    private Map<String, JarLoader> jarLoaders = new HashMap<>();
 
     private String userAgent = "okhttp/3.15";
 
@@ -226,24 +222,6 @@ public class ApiConfig {
                     }
                 });
     }
-    
-    private void loadOtherJars() {
-        for (String spiderKey : spiders.keySet()) {
-            if(jarLoaders.containsKey(spiderKey))
-                continue;
-            System.out.println("正在载入更多爬虫代码..." + spiderKey);
-            loadJar(true, spiderKey, spiders.get(spiderKey), new LoadConfigCallback() {
-                @Override
-                public void success() { }
-
-                @Override
-                public void retry() { }
-
-                @Override
-                public void error(String msg) { }
-            });
-        }
-    }
 
 
     public void loadJar(boolean useCache, String spider, LoadConfigCallback callback) {
@@ -324,23 +302,12 @@ public class ApiConfig {
     }
 
     private void parseJson(String apiUrl, String jsonStr) {
-        //pyramid-add-start
-        PythonLoader.getInstance().setConfig(jsonStr);
-        //pyramid-add-end
+    //pyramid-add-start
+	PythonLoader.getInstance().setConfig(jsonStr);
+    //pyramid-add-end
         JsonObject infoJson = new Gson().fromJson(jsonStr, JsonObject.class);
         // spider
-        String spider = DefaultConfig.safeJsonString(infoJson, "spider", null);
-        if(spider == null && infoJson.has("spider")) {
-            try {
-                JsonArray spiderArr = infoJson.getAsJsonArray("spider");
-                for(int i = 0; i <spiderArr.size(); i++) {
-                    JsonObject spiderKeyVal = spiderArr.get(i).getAsJsonObject();
-                    spiders.put(spiderKeyVal.get("n").getAsString(), spiderKeyVal.get("v").getAsString());
-                }
-            }catch (Exception ex) {}
-        } else {
-            spiders.put("default", spider);
-        }
+        spider = DefaultConfig.safeJsonString(infoJson, "spider", "");
         // 远端站点源
         SourceBean firstSite = null;
         for (JsonElement opt : infoJson.get("sites").getAsJsonArray()) {
@@ -602,7 +569,7 @@ public class ApiConfig {
     }
 
     public Spider getCSP(SourceBean sourceBean) {
-            //pyramid-add-start
+    //pyramid-add-start
     if (sourceBean.getApi().startsWith("py_")) {
         try {
             return PythonLoader.getInstance().getSpider(sourceBean.getKey(), sourceBean.getExt());
@@ -612,14 +579,11 @@ public class ApiConfig {
         }
     }
     //pyramid-add-end
-            if(jarLoaders.containsKey(sourceBean.getSpider()))
-            return jarLoaders.get(sourceBean.getSpider()).getSpider(sourceBean.getKey(), sourceBean.getApi(), sourceBean.getExt());
-        else
-            return new SpiderNull();
+        return jarLoader.getSpider(sourceBean.getKey(), sourceBean.getApi(), sourceBean.getExt(), sourceBean.getJar());
     }
 
     public Object[] proxyLocal(Map param) {
-            //pyramid-add-start
+        //pyramid-add-start
     try {
         if(param.containsKey("api")){
             String doStr = param.get("do").toString();
@@ -635,28 +599,24 @@ public class ApiConfig {
         e.printStackTrace();
     }
     //pyramid-add-end
-        return getHomeJarLoader().proxyInvoke(param);
+        return jarLoader.proxyInvoke(param);
     }
 
     public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
-        return getHomeJarLoader().jsonExt(key, jxs, url);
+        return jarLoader.jsonExt(key, jxs, url);
     }
 
     public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
-        return getHomeJarLoader().jsonExtMix(flag, key, name, jxs, url);
+        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
-    private JarLoader getHomeJarLoader() {
-        return jarLoaders.get(getHomeSourceBean().getSpider());
-    }
-
-    public String getRequestBackgroundUrl() {
+       public String getRequestBackgroundUrl() {
         return requestBackgroundUrl;
     }
 
     public void setRequestBackgroundUrl(String requestBackgroundUrl) {
         this.requestBackgroundUrl = requestBackgroundUrl;
-    }
+
     public interface LoadConfigCallback {
         void success();
 
