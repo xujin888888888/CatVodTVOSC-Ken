@@ -144,7 +144,7 @@ public class SearchActivity extends BaseActivity {
             }
         }
     }
-
+}
     private void initView() {
         EventBus.getDefault().register(this);
         llLayout = findViewById(R.id.llLayout);
