@@ -362,15 +362,6 @@ public class SearchActivity extends BaseActivity {
         searchAdapter.setNewData(new ArrayList<>());
         vodSearch.searchResult(searchTitle, false);
     }
-    
-    private void search(String title) {
-        cancel();
-        showLoading();
-        this.searchTitle = title;
-        mGridView.setVisibility(View.INVISIBLE);
-        searchAdapter.setNewData(new ArrayList<>());
-        searchResult();
-    }
 
     private ExecutorService searchExecutorService = null;
     private AtomicInteger allRunCount = new AtomicInteger(0);
