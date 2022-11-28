@@ -1,6 +1,7 @@
 package com.github.tvbox.osc.ui.activity;
 
 import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
