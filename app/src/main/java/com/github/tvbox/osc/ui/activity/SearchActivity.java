@@ -74,6 +74,7 @@ public class SearchActivity extends BaseActivity {
     private SearchAdapter searchAdapter;
     private PinyinAdapter wordAdapter;
     private String searchTitle = "";
+    private static HashMap<String, String> mCheckSources = null;
     private View footLoading = null;
     private VodSearch vodSearch;
 
@@ -318,6 +319,16 @@ public class SearchActivity extends BaseActivity {
             }
         }
     }
+    
+    
+    private void initCheckedSourcesForSearch() {
+        mCheckSources = SearchHelper.getSourcesForSearch();
+    }
+    
+       public static void setCheckedSourcesForSearch(HashMap<String,String> checkedSources) {
+        mCheckSources = checkedSources;
+    }
+
 
     private void search(String title) {
         cancel();
