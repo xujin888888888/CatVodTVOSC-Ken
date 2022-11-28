@@ -85,12 +85,40 @@ public class SearchActivity extends BaseActivity {
     protected int getLayoutResID() {
         return R.layout.activity_search;
     }
+    
+    private static Boolean hasKeyBoard;
+    private static Boolean isSearchBack;
 
     @Override
     protected void init() {
         initView();
         initViewModel();
         initData();
+        hasKeyBoard = true;
+        isSearchBack = false;
+    }
+
+    /*
+     * 禁止软键盘
+     * @param activity Activity
+     */
+    public static void disableKeyboard(Activity activity) {
+        hasKeyBoard = false;
+        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+
+    /*
+     * 启用软键盘
+     * @param activity Activity
+     */
+    public static void enableKeyboard(Activity activity) {
+        hasKeyBoard = true;
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+
+    public void openSystemKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(this.getCurrentFocus(), InputMethodManager.SHOW_FORCED);
     }
 
     private List<Runnable> pauseRunnable = null;
@@ -106,6 +134,14 @@ public class SearchActivity extends BaseActivity {
             }
             pauseRunnable.clear();
             pauseRunnable = null;
+        if (hasKeyBoard) {
+            tvSearch.requestFocus();
+            tvSearch.requestFocusFromTouch();
+        }else {
+            if(!isSearchBack){
+                etSearch.requestFocus();
+                etSearch.requestFocusFromTouch();
+            }
         }
     }
 
@@ -151,10 +187,14 @@ public class SearchActivity extends BaseActivity {
                     try {
                         if (vodSearch.getSearchExecutorService() != null) {
                             pauseRunnable = vodSearch.getSearchExecutorService().shutdownNow();
+                           JSEngine.getInstance().stopAll();
+                            searchExecutorService = null;
                         }
                     } catch (Throwable th) {
                         th.printStackTrace();
                     }
+                    hasKeyBoard = false;
+                    isSearchBack = true;
                     Bundle bundle = new Bundle();
                     bundle.putString("id", video.id);
                     bundle.putString("sourceKey", video.sourceKey);
@@ -345,6 +385,73 @@ public class SearchActivity extends BaseActivity {
         searchAdapter.setNewData(new ArrayList<>());
         vodSearch.searchResult(searchTitle, false);
     }
+    
+    private void initCheckedSourcesForSearch() {
+        mCheckSources = SearchHelper.getSourcesForSearch();
+    }
+
+    public static void setCheckedSourcesForSearch(HashMap<String,String> checkedSources) {
+        mCheckSources = checkedSources;
+    }
+
+    private void search(String title) {
+        cancel();
+        showLoading();
+        this.searchTitle = title;
+        mGridView.setVisibility(View.INVISIBLE);
+        searchAdapter.setNewData(new ArrayList<>());
+        searchResult();
+    }
+
+    private ExecutorService searchExecutorService = null;
+    private AtomicInteger allRunCount = new AtomicInteger(0);
+
+    private void searchResult() {
+        try {
+            if (searchExecutorService != null) {
+                searchExecutorService.shutdownNow();
+                JSEngine.getInstance().stopAll();
+                searchExecutorService = null;
+            }
+        } catch (Throwable th) {
+            th.printStackTrace();
+        } finally {
+            searchAdapter.setNewData(new ArrayList<>());
+            allRunCount.set(0);
+        }
+        searchExecutorService = Executors.newFixedThreadPool(5);
+        List<SourceBean> searchRequestList = new ArrayList<>();
+        searchRequestList.addAll(ApiConfig.get().getSourceBeanList());
+        SourceBean home = ApiConfig.get().getHomeSourceBean();
+        searchRequestList.remove(home);
+        searchRequestList.add(0, home);
+
+        ArrayList<String> siteKey = new ArrayList<>();
+        for (SourceBean bean : searchRequestList) {
+            if (!bean.isSearchable()) {
+                continue;
+            }
+            if (mCheckSources != null && !mCheckSources.containsKey(bean.getKey())) {
+                continue;
+            }
+            siteKey.add(bean.getKey());
+            allRunCount.incrementAndGet();
+        }
+        if (siteKey.size() <= 0) {
+            Toast.makeText(mContext, "没有指定搜索源", Toast.LENGTH_SHORT).show();
+            showEmpty();
+            return;
+        }
+        for (String key : siteKey) {
+            searchExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    sourceViewModel.getSearch(key, searchTitle);
+                }
+            });
+        }
+    }
+
 
     private void searchData(AbsXml absXml) {
         if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && absXml.movie.videoList.size() > 0) {
@@ -389,7 +496,15 @@ public class SearchActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         cancel();
-        vodSearch.destroy();
+        try {
+            if (searchExecutorService != null) {
+                searchExecutorService.shutdownNow();
+                JSEngine.getInstance().stopAll();
+                searchExecutorService = null;
+            }
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
         EventBus.getDefault().unregister(this);
     }
 }
