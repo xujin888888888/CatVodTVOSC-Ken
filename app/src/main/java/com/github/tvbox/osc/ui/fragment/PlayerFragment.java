@@ -927,7 +927,7 @@ public class PlayerFragment  extends BaseLazyFragment {
                                 }
                             });
                         } else {
-                            HashMap<String, String> headers = null;
+                            HashMap<String, String> headers = new HashMap<>();
                             if (rs.has("header")) {
                                 try {
                                     JSONObject hds = rs.getJSONObject("header");
