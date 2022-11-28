@@ -97,30 +97,7 @@ public class SearchActivity extends BaseActivity {
         hasKeyBoard = true;
         isSearchBack = false;
     }
-
-    /*
-     * 禁止软键盘
-     * @param activity Activity
-     */
-    public static void disableKeyboard(Activity activity) {
-        hasKeyBoard = false;
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-    }
-
-    /*
-     * 启用软键盘
-     * @param activity Activity
-     */
-    public static void enableKeyboard(Activity activity) {
-        hasKeyBoard = true;
-        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-    }
-
-    public void openSystemKeyBoard() {
-        InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(this.getCurrentFocus(), InputMethodManager.SHOW_FORCED);
-    }
-
+    
     private List<Runnable> pauseRunnable = null;
 
     @Override
@@ -386,14 +363,6 @@ public class SearchActivity extends BaseActivity {
         vodSearch.searchResult(searchTitle, false);
     }
     
-    private void initCheckedSourcesForSearch() {
-        mCheckSources = SearchHelper.getSourcesForSearch();
-    }
-
-    public static void setCheckedSourcesForSearch(HashMap<String,String> checkedSources) {
-        mCheckSources = checkedSources;
-    }
-
     private void search(String title) {
         cancel();
         showLoading();
