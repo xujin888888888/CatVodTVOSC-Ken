@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class CheckboxSearchAdapter extends ListAdapter<SourceBean, CheckboxSearchAdapter.ViewHolder> {
+public class CheckboxSearchAdapter extends ListAdapter<SourceBean, ViewHolder> {
 
     public CheckboxSearchAdapter(DiffUtil.ItemCallback<SourceBean> diffCallback) {
         super(diffCallback);
