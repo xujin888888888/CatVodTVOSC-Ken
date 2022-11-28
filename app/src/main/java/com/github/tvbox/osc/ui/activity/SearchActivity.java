@@ -25,7 +25,7 @@ import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.adapter.PinyinAdapter;
 import com.github.tvbox.osc.ui.adapter.SearchAdapter;
 import com.github.tvbox.osc.ui.dialog.RemoteDialog;
-import com.github.tvbox.osc.ui.dialog.SearchCheckboxDialog
+import com.github.tvbox.osc.ui.dialog.SearchCheckboxDialog;
 import com.github.tvbox.osc.ui.tv.QRCodeGen;
 import com.github.tvbox.osc.ui.tv.widget.SearchKeyboard;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
