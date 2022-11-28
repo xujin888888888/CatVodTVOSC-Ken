@@ -1,12 +1,18 @@
 package com.github.tvbox.osc.util;
 
+import android.os.Environment;
+
+import com.github.tvbox.osc.base.App;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public class FileUtils {
@@ -65,5 +71,70 @@ public class FileUtils {
             }
         }
         file.delete();
+    }
+
+    public static String readFileToString(String path, String charsetName) {
+        // 定义返回结果
+        String jsonString = "";
+
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path)), charsetName));// 读取文件
+            String thisLine = null;
+            while ((thisLine = in.readLine()) != null) {
+                jsonString += thisLine;
+            }
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException el) {
+                }
+            }
+        }
+        // 返回拼接好的JSON String
+        return jsonString;
+    }
+
+    public static String getAssetFile(String assetName) throws IOException {
+        InputStream is = App.getInstance().getAssets().open(assetName);
+        byte[] data = new byte[is.available()];
+        is.read(data);
+        return new String(data, "UTF-8");
+    }
+
+    public static boolean isAssetFile(String name, String path) {
+        try {
+            for(String one : App.getInstance().getAssets().list(path)) {
+                if (one.equals(name)) return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String getRootPath() {
+        return Environment.getExternalStorageDirectory().getAbsolutePath();
+    }
+
+    public static File getLocal(String path) {
+        return new File(path.replace("file:/", getRootPath()));
+    }
+
+    public static String read(String path) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(getLocal(path))));
+            StringBuilder sb = new StringBuilder();
+            String text;
+            while ((text = br.readLine()) != null) sb.append(text).append("\n");
+            br.close();
+            return sb.toString();
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
