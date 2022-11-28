@@ -147,17 +147,13 @@ public class SearchActivity extends BaseActivity {
                 FastClickCheckUtil.check(view);
                 Movie.Video video = searchAdapter.getData().get(position);
                 if (video != null) {
-                  try {
-                              if (searchExecutorService != null) {
-                            pauseRunnable = searchExecutorService.shutdownNow();
-                            JSEngine.getInstance().stopAll();
-                            searchExecutorService = null;
+                    try {
+                        if (vodSearch.getSearchExecutorService() != null) {
+                            pauseRunnable = vodSearch.getSearchExecutorService().shutdownNow();
                         }
                     } catch (Throwable th) {
                         th.printStackTrace();
                     }
-                    hasKeyBoard = false;
-                    isSearchBack = true;
                     Bundle bundle = new Bundle();
                     bundle.putString("id", video.id);
                     bundle.putString("sourceKey", video.sourceKey);
@@ -360,56 +356,6 @@ public class SearchActivity extends BaseActivity {
         searchAdapter.setNewData(new ArrayList<>());
         vodSearch.searchResult(searchTitle, false);
     }
-    
-    private ExecutorService searchExecutorService = null;
-    private AtomicInteger allRunCount = new AtomicInteger(0);
-
-    private void searchResult() {
-        try {
-            if (searchExecutorService != null) {
-                searchExecutorService.shutdownNow();
-                JSEngine.getInstance().stopAll();
-                searchExecutorService = null;
-            }
-        } catch (Throwable th) {
-            th.printStackTrace();
-        } finally {
-            searchAdapter.setNewData(new ArrayList<>());
-            allRunCount.set(0);
-        }
-        searchExecutorService = Executors.newFixedThreadPool(5);
-        List<SourceBean> searchRequestList = new ArrayList<>();
-        searchRequestList.addAll(ApiConfig.get().getSourceBeanList());
-        SourceBean home = ApiConfig.get().getHomeSourceBean();
-        searchRequestList.remove(home);
-        searchRequestList.add(0, home);
-
-        ArrayList<String> siteKey = new ArrayList<>();
-        for (SourceBean bean : searchRequestList) {
-            if (!bean.isSearchable()) {
-                continue;
-            }
-            if (mCheckSources != null && !mCheckSources.containsKey(bean.getKey())) {
-                continue;
-            }
-            siteKey.add(bean.getKey());
-            allRunCount.incrementAndGet();
-        }
-        if (siteKey.size() <= 0) {
-            Toast.makeText(mContext, "没有指定搜索源", Toast.LENGTH_SHORT).show();
-            showEmpty();
-            return;
-        }
-        for (String key : siteKey) {
-            searchExecutorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    sourceViewModel.getSearch(key, searchTitle);
-                }
-            });
-        }
-    }
-
 
     private void searchData(AbsXml absXml) {
         if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && absXml.movie.videoList.size() > 0) {
@@ -454,15 +400,7 @@ public class SearchActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         cancel();
-        try {
-            if (searchExecutorService != null) {
-                searchExecutorService.shutdownNow();
-                JSEngine.getInstance().stopAll();
-                searchExecutorService = null;
-            }
-        } catch (Throwable th) {
-            th.printStackTrace();
-        }
+        vodSearch.destroy();
         EventBus.getDefault().unregister(this);
     }
 }
