@@ -30,6 +30,7 @@ import com.github.tvbox.osc.ui.tv.widget.SearchKeyboard;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.VodSearch;
+import com.github.tvbox.osc.js.JSEngine;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -74,6 +75,7 @@ public class SearchActivity extends BaseActivity {
     private SearchAdapter searchAdapter;
     private PinyinAdapter wordAdapter;
     private String searchTitle = "";
+    private TextView tvSearchCheckboxBtn;
     private View footLoading = null;
     private VodSearch vodSearch;
 
@@ -110,6 +112,7 @@ public class SearchActivity extends BaseActivity {
         llLayout = findViewById(R.id.llLayout);
         etSearch = findViewById(R.id.etSearch);
         tvSearch = findViewById(R.id.tvSearch);
+        tvSearchCheckboxBtn = findViewById(R.id.tvSearchCheckboxBtn);
         tvClear = findViewById(R.id.tvClear);
         tvAddress = findViewById(R.id.tvAddress);
         ivQRCode = findViewById(R.id.ivQRCode);
@@ -144,13 +147,17 @@ public class SearchActivity extends BaseActivity {
                 FastClickCheckUtil.check(view);
                 Movie.Video video = searchAdapter.getData().get(position);
                 if (video != null) {
-                    try {
-                        if (vodSearch.getSearchExecutorService() != null) {
-                            pauseRunnable = vodSearch.getSearchExecutorService().shutdownNow();
+                  try {
+                              if (searchExecutorService != null) {
+                            pauseRunnable = searchExecutorService.shutdownNow();
+                            JSEngine.getInstance().stopAll();
+                            searchExecutorService = null;
                         }
                     } catch (Throwable th) {
                         th.printStackTrace();
                     }
+                    hasKeyBoard = false;
+                    isSearchBack = true;
                     Bundle bundle = new Bundle();
                     bundle.putString("id", video.id);
                     bundle.putString("sourceKey", video.sourceKey);
@@ -199,6 +206,28 @@ public class SearchActivity extends BaseActivity {
             }
         });
         setLoadSir(llLayout);
+        tvSearchCheckboxBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSearchCheckboxDialog == null) {
+                    List<SourceBean> allSourceBean = ApiConfig.get().getSourceBeanList();
+                    List<SourceBean> searchAbleSource = new ArrayList<>();
+                    for(SourceBean sourceBean : allSourceBean) {
+                        if (sourceBean.isSearchable()) {
+                            searchAbleSource.add(sourceBean);
+                        }
+                    }
+                    mSearchCheckboxDialog = new SearchCheckboxDialog(SearchActivity.this, searchAbleSource, mCheckSources);
+                }
+                mSearchCheckboxDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        dialog.dismiss();
+                    }
+                });
+                mSearchCheckboxDialog.show();
+            }
+        });
     }
 
     private void initViewModel() {
@@ -331,6 +360,56 @@ public class SearchActivity extends BaseActivity {
         searchAdapter.setNewData(new ArrayList<>());
         vodSearch.searchResult(searchTitle, false);
     }
+    
+    private ExecutorService searchExecutorService = null;
+    private AtomicInteger allRunCount = new AtomicInteger(0);
+
+    private void searchResult() {
+        try {
+            if (searchExecutorService != null) {
+                searchExecutorService.shutdownNow();
+                JSEngine.getInstance().stopAll();
+                searchExecutorService = null;
+            }
+        } catch (Throwable th) {
+            th.printStackTrace();
+        } finally {
+            searchAdapter.setNewData(new ArrayList<>());
+            allRunCount.set(0);
+        }
+        searchExecutorService = Executors.newFixedThreadPool(5);
+        List<SourceBean> searchRequestList = new ArrayList<>();
+        searchRequestList.addAll(ApiConfig.get().getSourceBeanList());
+        SourceBean home = ApiConfig.get().getHomeSourceBean();
+        searchRequestList.remove(home);
+        searchRequestList.add(0, home);
+
+        ArrayList<String> siteKey = new ArrayList<>();
+        for (SourceBean bean : searchRequestList) {
+            if (!bean.isSearchable()) {
+                continue;
+            }
+            if (mCheckSources != null && !mCheckSources.containsKey(bean.getKey())) {
+                continue;
+            }
+            siteKey.add(bean.getKey());
+            allRunCount.incrementAndGet();
+        }
+        if (siteKey.size() <= 0) {
+            Toast.makeText(mContext, "没有指定搜索源", Toast.LENGTH_SHORT).show();
+            showEmpty();
+            return;
+        }
+        for (String key : siteKey) {
+            searchExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    sourceViewModel.getSearch(key, searchTitle);
+                }
+            });
+        }
+    }
+
 
     private void searchData(AbsXml absXml) {
         if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && absXml.movie.videoList.size() > 0) {
@@ -375,7 +454,15 @@ public class SearchActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         cancel();
-        vodSearch.destroy();
+        try {
+            if (searchExecutorService != null) {
+                searchExecutorService.shutdownNow();
+                JSEngine.getInstance().stopAll();
+                searchExecutorService = null;
+            }
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
         EventBus.getDefault().unregister(this);
     }
 }
