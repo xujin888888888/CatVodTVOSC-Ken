@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId 'com.github.tvbox.osc.km'
         minSdkVersion 18
-        targetSdkVersion 31
+        targetSdkVersion 26
         versionCode 2
         versionName '0.8.20220915'
         multiDexEnabled true
@@ -81,14 +81,16 @@ dependencies {
     }
     implementation 'com.github.NanoHttpd.nanohttpd:nanohttpd:nanohttpd-project-2.3.1'
     implementation 'com.github.NanoHttpd.nanohttpd:nanohttpd:nanohttpd-websocket-2.3.1'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.android.material:material:1.4.0'
-    implementation files('libs\\thunder.jar', 'libs\\xwalk_shared_library-23.53.589.4.aar','libs\\pyramid.aar','libs\\exo-extension-ffmpeg.aar', 'libs\\exo-extension-okhttp.aar')
-
+    implementation files('libs\\thunder.jar','libs\\pyramid.aar','libs\\exo-extension-ffmpeg.aar',libs\\commons-lang3-3.12.0.jar, 'libs\\exo-extension-okhttp.aar')
+    
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     annotationProcessor 'androidx.room:room-compiler:2.3.0'
     implementation 'androidx.room:room-runtime:2.3.0'
     implementation 'androidx.multidex:multidex:2.0.1'
@@ -107,9 +109,9 @@ dependencies {
 
     implementation project(":player")
 
-//    implementation('org.xwalk:xwalk_shared_library:23.53.589.4') {
-//        exclude group: 'com.android.support'
-//    }
+    implementation('org.xwalk:xwalk_shared_library:23.53.589.4') {
+        exclude group: 'com.android.support'
+    }
     implementation 'com.lzy.net:okgo:3.0.4'
     // implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
     implementation 'com.owen:tv-recyclerview:3.0.0'
@@ -119,6 +121,7 @@ dependencies {
     implementation "cn.wanghaomiao:JsoupXpath:2.5.0"
     implementation 'com.github.hedzr:android-file-chooser:v1.2.0-final'
     implementation 'com.github.seven332:jcifs:1.3.19'
+    implementation 'commons-io:commons-io:2.11.0'
     implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
     implementation 'io.github.taoweiji.quickjs:quickjs-android:1.+'
     configurations {
