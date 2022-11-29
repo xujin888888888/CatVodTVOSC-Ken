@@ -12,8 +12,6 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.model.Response;
 import com.lzy.okgo.request.PostRequest;
-import com.thegrizzlylabs.sardineandroid.DavResource;
-import com.thegrizzlylabs.sardineandroid.Sardine;
 
 import org.json.JSONObject;
 
@@ -22,14 +20,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class AlistDriveViewModel extends AbstractDriveViewModel{
+public class AlistDriveViewModel extends AbstractDriveViewModel {
 
     private void setRequestHeader(PostRequest request, String origin) {
         request.headers("User-Agent", UA.random());
-        if(origin != null && !origin.isEmpty()) {
-            if(origin.endsWith("/"))
+        if (origin != null && !origin.isEmpty()) {
+            if (origin.endsWith("/"))
                 origin = origin.substring(0, origin.length() - 1);
             request.headers("origin", origin);
         }
@@ -40,12 +37,12 @@ public class AlistDriveViewModel extends AbstractDriveViewModel{
     @Override
     public String loadData(LoadDataCallback callback) {
         JsonObject config = currentDrive.getConfig();
-        if(currentDriveNote == null) {
+        if (currentDriveNote == null) {
             currentDriveNote = new DriveFolderFile(null,
                     config.has("initPath") ? config.get("initPath").getAsString() : "", false, null, null);
         }
         String targetPath = currentDriveNote.getAccessingPathStr() + currentDriveNote.name;
-        if(currentDriveNote.getChildren() == null) {
+        if (currentDriveNote.getChildren() == null) {
             new Thread() {
                 public void run() {
                     String webLink = config.get("url").getAsString();
@@ -102,12 +99,12 @@ public class AlistDriveViewModel extends AbstractDriveViewModel{
                                     if (callback != null)
                                         callback.callback(currentDriveNote.getChildren(), false);
                                 } catch (Exception ex) {
-                                    if(callback != null)
+                                    if (callback != null)
                                         callback.fail("无法访问，请注意地址格式");
                                 }
                             }
                         });
-                    }catch (Exception ex) {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
@@ -115,7 +112,7 @@ public class AlistDriveViewModel extends AbstractDriveViewModel{
             return targetPath;
         } else {
             sortData(currentDriveNote.getChildren());
-            if(callback != null)
+            if (callback != null)
                 callback.callback(currentDriveNote.getChildren(), true);
         }
         return targetPath;
@@ -124,7 +121,7 @@ public class AlistDriveViewModel extends AbstractDriveViewModel{
     @Override
     public Runnable search(String keyword, LoadDataCallback callback) {
         JsonObject config = currentDrive.getConfig();
-        if(currentDriveNote == null) {
+        if (currentDriveNote == null) {
             currentDriveNote = new DriveFolderFile(null,
                     config.has("initPath") ? config.get("initPath").getAsString() : "", false, null, null);
         }
@@ -176,12 +173,12 @@ public class AlistDriveViewModel extends AbstractDriveViewModel{
                                 if (callback != null)
                                     callback.callback(items, false);
                             } catch (Exception ex) {
-                                if(callback != null)
+                                if (callback != null)
                                     callback.fail("无法访问，请注意地址格式");
                             }
                         }
                     });
-                }catch (Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
@@ -189,10 +186,10 @@ public class AlistDriveViewModel extends AbstractDriveViewModel{
     }
 
     public void loadFile(DriveFolderFile targetFile, LoadFileCallback callback) {
-        if(targetFile.fileUrl != null && !targetFile.fileUrl.isEmpty()) {
+        if (targetFile.fileUrl != null && !targetFile.fileUrl.isEmpty()) {
             if (callback != null)
                 callback.callback(targetFile.fileUrl);
-        }else {
+        } else {
             new Thread() {
                 public void run() {
                     JsonObject config = currentDrive.getConfig();
@@ -221,19 +218,19 @@ public class AlistDriveViewModel extends AbstractDriveViewModel{
                                 List<DriveFolderFile> items = new ArrayList<>();
                                 if (respData.get("code").getAsInt() == 200) {
                                     JsonArray files = respData.get("data").getAsJsonObject().get("files").getAsJsonArray();
-                                    if(files.size() > 0 && callback != null) {
+                                    if (files.size() > 0 && callback != null) {
                                         callback.callback(files.get(0).getAsJsonObject().get("url").getAsString());
                                         return;
                                     }
                                 }
-                                if(callback != null)
+                                if (callback != null)
                                     callback.fail("不能获取该视频地址");
 
                             }
                         });
-                    }catch (Exception ex) {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
-                        if(callback != null)
+                        if (callback != null)
                             callback.fail("不能获取该视频地址");
                     }
                 }
@@ -243,6 +240,7 @@ public class AlistDriveViewModel extends AbstractDriveViewModel{
 
     public interface LoadFileCallback {
         void callback(String fileUrl);
+
         void fail(String msg);
     }
 }

@@ -32,10 +32,6 @@ public abstract class AbstractDriveViewModel extends ViewModel {
         this.currentDriveNote = currentDriveNote;
     }
 
-    public int getSortType() {
-        return sortType;
-    }
-
     public void setSortType(int sortType) {
         this.sortType = sortType;
     }
@@ -46,10 +42,10 @@ public abstract class AbstractDriveViewModel extends ViewModel {
 
     protected void sortData(List<DriveFolderFile> data) {
         DriveFolderFile backItem = null;
-        if(data.size() > 0 && data.get(0).name == null)
+        if (data.size() > 0 && data.get(0).name == null)
             backItem = data.remove(0);
         Collections.sort(data, sortComparator);
-        if(backItem != null)
+        if (backItem != null)
             data.add(0, backItem);
     }
 

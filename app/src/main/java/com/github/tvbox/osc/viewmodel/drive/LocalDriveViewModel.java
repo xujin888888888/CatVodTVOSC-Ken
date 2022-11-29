@@ -15,13 +15,13 @@ public class LocalDriveViewModel extends AbstractDriveViewModel {
 
     @Override
     public String loadData(LoadDataCallback callback) {
-        if(currentDriveNote == null)
+        if (currentDriveNote == null)
             currentDriveNote = new DriveFolderFile(null, "", false, null, null);
         String path = currentDrive.name + currentDriveNote.getAccessingPathStr() + currentDriveNote.name;
-        if(currentDriveNote.getChildren() == null) {
+        if (currentDriveNote.getChildren() == null) {
             File[] files = (new File(path)).listFiles();
             List<DriveFolderFile> items = new ArrayList<>();
-            if(files != null) {
+            if (files != null) {
                 for (File file : files) {
                     int extNameStartIndex = file.getName().lastIndexOf(".");
                     items.add(new DriveFolderFile(currentDriveNote, file.getName(), file.isFile(),
@@ -35,7 +35,7 @@ public class LocalDriveViewModel extends AbstractDriveViewModel {
             backItem.parentFolder = backItem;
             items.add(0, backItem);
             currentDriveNote.setChildren(items);
-            if(callback != null) {
+            if (callback != null) {
                 callback.callback(currentDriveNote.getChildren(), false);
             }
         } else {
@@ -51,7 +51,7 @@ public class LocalDriveViewModel extends AbstractDriveViewModel {
         return new Runnable() {
             @Override
             public void run() {
-                if(callback != null)
+                if (callback != null)
                     callback.callback(null, false);
             }
         };

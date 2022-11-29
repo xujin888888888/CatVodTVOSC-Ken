@@ -15,21 +15,22 @@ public class WebDAVDriveViewModel extends AbstractDriveViewModel {
     private Sardine webDAV;
 
     private boolean initWebDav() {
-        if(webDAV != null)
+        if (webDAV != null)
             return true;
         try {
             JsonObject config = currentDrive.getConfig();
             webDAV = new OkHttpSardine();
-            if(config.has("username") && config.has("password")) {
+            if (config.has("username") && config.has("password")) {
                 webDAV.setCredentials(config.get("username").getAsString(), config.get("password").getAsString());
             }
             return true;
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
         return false;
     }
 
     private Sardine getWebDAV() {
-        if(initWebDav()) {
+        if (initWebDav()) {
             return webDAV;
         }
         return null;
@@ -38,16 +39,16 @@ public class WebDAVDriveViewModel extends AbstractDriveViewModel {
     @Override
     public String loadData(LoadDataCallback callback) {
         JsonObject config = currentDrive.getConfig();
-        if(currentDriveNote == null) {
+        if (currentDriveNote == null) {
             currentDriveNote = new DriveFolderFile(null,
                     config.has("initPath") ? config.get("initPath").getAsString() : "", false, null, null);
         }
         String targetPath = currentDriveNote.getAccessingPathStr() + currentDriveNote.name;
-        if(currentDriveNote.getChildren() == null) {
+        if (currentDriveNote.getChildren() == null) {
             new Thread() {
                 public void run() {
                     Sardine webDAV = getWebDAV();
-                    if(webDAV == null && callback != null) {
+                    if (webDAV == null && callback != null) {
                         callback.fail("无法访问该WebDAV地址");
                         return;
                     }
@@ -55,15 +56,15 @@ public class WebDAVDriveViewModel extends AbstractDriveViewModel {
                     try {
                         files = webDAV.list(config.get("url").getAsString() + targetPath);
                     } catch (Exception ex) {
-                        if(callback != null)
+                        if (callback != null)
                             callback.fail("无法访问该WebDAV地址");
                         return;
                     }
 
                     List<DriveFolderFile> items = new ArrayList<>();
-                    if(files != null) {
+                    if (files != null) {
                         for (DavResource file : files) {
-                            if(targetPath != null && file.getPath().toUpperCase(Locale.ROOT).endsWith(targetPath.toUpperCase(Locale.ROOT) + "/"))
+                            if (targetPath != null && file.getPath().toUpperCase(Locale.ROOT).endsWith(targetPath.toUpperCase(Locale.ROOT) + "/"))
                                 continue;
                             int extNameStartIndex = file.getName().lastIndexOf(".");
                             items.add(new DriveFolderFile(currentDriveNote, file.getName(), !file.isDirectory(),
@@ -77,15 +78,15 @@ public class WebDAVDriveViewModel extends AbstractDriveViewModel {
                     backItem.parentFolder = backItem;
                     items.add(0, backItem);
                     currentDriveNote.setChildren(items);
-                    if(callback != null)
+                    if (callback != null)
                         callback.callback(currentDriveNote.getChildren(), false);
 
                 }
             }.start();
-                return targetPath;
+            return targetPath;
         } else {
             sortData(currentDriveNote.getChildren());
-            if(callback != null)
+            if (callback != null)
                 callback.callback(currentDriveNote.getChildren(), true);
         }
         return targetPath;
@@ -97,7 +98,7 @@ public class WebDAVDriveViewModel extends AbstractDriveViewModel {
         return new Runnable() {
             @Override
             public void run() {
-                if(callback != null)
+                if (callback != null)
                     callback.callback(null, false);
             }
         };
