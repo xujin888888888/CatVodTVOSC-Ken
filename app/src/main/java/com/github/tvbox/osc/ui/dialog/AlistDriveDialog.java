@@ -101,5 +101,4 @@ public class AlistDriveDialog extends BaseDialog {
             etField.setText(config.get(fieldName).getAsString());
     }
 
-
 }
