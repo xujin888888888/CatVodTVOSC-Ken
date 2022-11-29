@@ -15,7 +15,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.base.BaseActivity;
@@ -24,16 +23,13 @@ import com.github.tvbox.osc.bean.VodInfo;
 import com.github.tvbox.osc.cache.RoomDataManger;
 import com.github.tvbox.osc.cache.StorageDrive;
 import com.github.tvbox.osc.event.RefreshEvent;
-import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.adapter.DriveAdapter;
 import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
 import com.github.tvbox.osc.ui.dialog.AlistDriveDialog;
-import com.github.tvbox.osc.ui.dialog.SearchDriveDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
 import com.github.tvbox.osc.ui.dialog.WebdavDialog;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.StorageDriveType;
 import com.github.tvbox.osc.viewmodel.drive.AbstractDriveViewModel;
 import com.github.tvbox.osc.viewmodel.drive.AlistDriveViewModel;
@@ -59,7 +55,6 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -75,14 +70,12 @@ public class DriveActivity extends BaseActivity {
     private TvRecyclerView mGridView;
     private ImageButton btnAddServer;
     private ImageButton btnRemoveServer;
-    private ImageButton btnSearch;
     private ImageButton btnSort;
     private DriveAdapter adapter = new DriveAdapter();
     private List<DriveFolderFile> drives = null;
     List<DriveFolderFile> searchResult = null;
     private AbstractDriveViewModel viewModel = null;
     private AbstractDriveViewModel backupViewModel = null;
-    private SelectDialog<Integer> thirdPlayerDialog;
     private int sortType = 0;
     private ExecutorService searchExecutorService = null;
     private AtomicInteger allSearchCount = new AtomicInteger(0);
@@ -118,10 +111,8 @@ public class DriveActivity extends BaseActivity {
         this.mGridView = findViewById(R.id.mGridView);
         this.btnRemoveServer = findViewById(R.id.btnRemoveServer);
         this.btnSort = findViewById(R.id.btnSort);
-        this.btnSearch = findViewById(R.id.btnSearch);
         footLoading = getLayoutInflater().inflate(R.layout.item_search_lite, null);
         footLoading.findViewById(R.id.tvName).setVisibility(View.GONE);
-        footLoading.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
         this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_FFFFFF));
         this.btnRemoveServer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,8 +145,8 @@ public class DriveActivity extends BaseActivity {
                 dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<StorageDriveType.TYPE>() {
                     @Override
                     public void click(StorageDriveType.TYPE value, int pos) {
-                        if(value == StorageDriveType.TYPE.LOCAL) {
-                            if(Build.VERSION.SDK_INT >= 23) {
+                        if (value == StorageDriveType.TYPE.LOCAL) {
+                            if (Build.VERSION.SDK_INT >= 23) {
                                 if (App.getInstance().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                                     ActivityCompat.requestPermissions(DriveActivity.this,
                                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -164,12 +155,10 @@ public class DriveActivity extends BaseActivity {
                             }
                             openFilePicker();
                             dialog.dismiss();
-                        }
-                        else if(value == StorageDriveType.TYPE.WEBDAV) {
+                        } else if (value == StorageDriveType.TYPE.WEBDAV) {
                             openWebdavDialog(null);
                             dialog.dismiss();
-                        }
-                        else if(value == StorageDriveType.TYPE.ALISTWEB) {
+                        } else if (value == StorageDriveType.TYPE.ALISTWEB) {
                             openAlistDriveDialog(null);
                             dialog.dismiss();
                         }
@@ -199,18 +188,18 @@ public class DriveActivity extends BaseActivity {
         this.adapter.bindToRecyclerView(this.mGridView);
         this.mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
-                if(position >= 0)
+                if (position >= 0)
                     adapter.getData().get(position).isSelected = false;
             }
 
             public void onItemSelected(TvRecyclerView tvRecyclerView, View view, int position) {
-                if(position >= 0)
+                if (position >= 0)
                     adapter.getData().get(position).isSelected = true;
             }
 
             @Override
             public void onItemClick(TvRecyclerView parent, View itemView, int position) {
-                if(delMode) {
+                if (delMode) {
                     DriveFolderFile selectedDrive = drives.get(position);
                     RoomDataManger.deleteDrive(selectedDrive.getDriveData().getId());
                     EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_DRIVE_REFRESH));
@@ -219,93 +208,66 @@ public class DriveActivity extends BaseActivity {
                 btnAddServer.setVisibility(View.GONE);
                 btnRemoveServer.setVisibility(View.GONE);
                 DriveFolderFile selectedItem = DriveActivity.this.adapter.getItem(position);
-                if((selectedItem == selectedItem.parentFolder || selectedItem.parentFolder == null) && selectedItem.name == null) {
+                if ((selectedItem == selectedItem.parentFolder || selectedItem.parentFolder == null) && selectedItem.name == null) {
                     returnPreviousFolder();
                     return;
                 }
-                if(viewModel == null) {
-                    if(selectedItem.getDriveType() == StorageDriveType.TYPE.LOCAL) {
-                        btnSearch.setVisibility(View.GONE);
+                if (viewModel == null) {
+                    if (selectedItem.getDriveType() == StorageDriveType.TYPE.LOCAL) {
                         viewModel = new LocalDriveViewModel();
-                    } else if(selectedItem.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
-                        btnSearch.setVisibility(View.GONE);
+                    } else if (selectedItem.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
                         viewModel = new WebDAVDriveViewModel();
-                    } else if(selectedItem.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
-                        if(isInSearch)
-                            btnSearch.setVisibility(View.GONE);
-                        else
-                            btnSearch.setVisibility(View.VISIBLE);
+                    } else if (selectedItem.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
                         viewModel = new AlistDriveViewModel();
                     }
                     viewModel.setCurrentDrive(selectedItem);
-                    if(!selectedItem.isFile) {
+                    if (!selectedItem.isFile) {
                         loadDriveData();
                         return;
                     }
                 }
-                if(!selectedItem.isFile) {
+                if (!selectedItem.isFile) {
                     viewModel.setCurrentDriveNote(selectedItem);
                     loadDriveData();
                 } else {
-                    DriveFolderFile currentDrive = viewModel.getCurrentDrive();
-                    if(currentDrive.getDriveType() == StorageDriveType.TYPE.LOCAL)
-                        playFile(currentDrive.name + selectedItem.getAccessingPathStr() + selectedItem.name);
-                    else if(currentDrive.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
-                        JsonObject config = currentDrive.getConfig();
-                        String targetPath = selectedItem.getAccessingPathStr() + selectedItem.name;
-                        playFile(config.get("url").getAsString() + targetPath);
-                    } else if(currentDrive.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
-                        AlistDriveViewModel boxedViewModel = (AlistDriveViewModel) viewModel;
-                        boxedViewModel.loadFile(selectedItem, new AlistDriveViewModel.LoadFileCallback() {
-                            @Override
-                            public void callback(String fileUrl) {
-                                mHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        playFile(fileUrl);
-                                    }
-                                });
-                            }
+                    // takagen99 - To only play media file
+                    if (StorageDriveType.isVideoType(selectedItem.fileType)) {
+                        DriveFolderFile currentDrive = viewModel.getCurrentDrive();
+                        if (currentDrive.getDriveType() == StorageDriveType.TYPE.LOCAL)
+                            playFile(currentDrive.name + selectedItem.getAccessingPathStr() + selectedItem.name);
+                        else if (currentDrive.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
+                            JsonObject config = currentDrive.getConfig();
+                            String targetPath = selectedItem.getAccessingPathStr() + selectedItem.name;
+                            playFile(config.get("url").getAsString() + targetPath);
+                        } else if (currentDrive.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
+                            AlistDriveViewModel boxedViewModel = (AlistDriveViewModel) viewModel;
+                            boxedViewModel.loadFile(selectedItem, new AlistDriveViewModel.LoadFileCallback() {
+                                @Override
+                                public void callback(String fileUrl) {
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            playFile(fileUrl);
+                                        }
+                                    });
+                                }
 
-                            @Override
-                            public void fail(String msg) {
-                                mHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast toast = Toast.makeText(mContext, msg,Toast.LENGTH_SHORT);
-                                        toast.show();
-                                    }
-                                });
-                            }
-                        });
+                                @Override
+                                public void fail(String msg) {
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast toast = Toast.makeText(mContext, msg, Toast.LENGTH_SHORT);
+                                            toast.show();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    } else {
+                        Toast.makeText(DriveActivity.this, "Media Unsupported", Toast.LENGTH_SHORT).show();
                     }
                 }
-            }
-        });
-        this.adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
-                if(viewModel != null) {
-                    DriveFolderFile selectedItem = DriveActivity.this.adapter.getItem(position);
-                    if(selectedItem.isFile) {
-                        open3rdPlayerSelectDialog(selectedItem);
-                        return false;
-                    }
-                }
-                return true;
-            }
-        });
-        this.btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SearchDriveDialog dialog = new SearchDriveDialog(mContext);
-                dialog.setOnListener(new SearchDriveDialog.OnListener() {
-                    @Override
-                    public void onchange(String keyword) {
-                        search(keyword);
-                    }
-                });
-                dialog.show();
             }
         });
         setLoadSir(findViewById(R.id.mLayout));
@@ -316,13 +278,13 @@ public class DriveActivity extends BaseActivity {
         vodInfo.name = "存储";
         vodInfo.playFlag = "drive";
         DriveFolderFile currentDrive = viewModel.getCurrentDrive();
-        if(currentDrive.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
+        if (currentDrive.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
             String credentialStr = currentDrive.getWebDAVBase64Credential();
-            if(credentialStr != null) {
+            if (credentialStr != null) {
                 JsonObject playerConfig = new JsonObject();
                 JsonArray headers = new JsonArray();
                 JsonElement authorization = JsonParser.parseString(
-                        "{ \"name\": \"authorization\", \"value\": \"Basic " + credentialStr +"\" }");
+                        "{ \"name\": \"authorization\", \"value\": \"Basic " + credentialStr + "\" }");
                 headers.add(authorization);
                 playerConfig.add("headers", headers);
                 vodInfo.playerCfg = playerConfig.toString();
@@ -339,96 +301,12 @@ public class DriveActivity extends BaseActivity {
         bundle.putBoolean("newSource", true);
         bundle.putString("sourceKey", "_drive");
         bundle.putSerializable("VodInfo", vodInfo);
+        // takagen99 - to play file here zzzzzzzzzzzzzzz
         jumpActivity(PlayActivity.class, bundle);
     }
 
-    private void open3rdPlayerSelectDialog(DriveFolderFile selectedItem) {
-        Integer[] types = PlayerHelper.getAvailable3rdPlayerTypes();
-        if(types == null || types.length == 0)
-            return;
-        Integer currentVal = Hawk.get(HawkConfig.THIRD_PARTY_PLAYER, types[0]);
-        int defaultPos = Arrays.binarySearch(types, currentVal);
-        if(defaultPos < 0)
-            defaultPos = 0;
-        thirdPlayerDialog = new SelectDialog<>(DriveActivity.this);
-        thirdPlayerDialog.setTip("请选择外部播放器");
-        thirdPlayerDialog.setItemCheckDisplay(false);
-        thirdPlayerDialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<Integer>() {
-            @Override
-            public void click(Integer value, int pos) {
-                DriveFolderFile currentDrive = viewModel.getCurrentDrive();
-                if(currentDrive.getDriveType() == StorageDriveType.TYPE.LOCAL) {
-                    playFileOn3rdPlayer(value, currentDrive.name + selectedItem.getAccessingPathStr() + selectedItem.name, null);
-                } else if(currentDrive.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
-                    HashMap<String, String> playingHeader = null;
-                    String credentialStr = viewModel.getCurrentDrive().getWebDAVBase64Credential();
-                    if(credentialStr != null) {
-                        playingHeader = new HashMap<>();
-                        playingHeader.put("authorization", "Basic " + credentialStr);
-                    }
-                    JsonObject config = currentDrive.getConfig();
-                    String targetPath = selectedItem.getAccessingPathStr() + selectedItem.name;
-                    playFileOn3rdPlayer(value, config.get("url").getAsString() + targetPath, playingHeader);
-                } else if(currentDrive.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
-                    AlistDriveViewModel boxedViewModel = (AlistDriveViewModel) viewModel;
-                    boxedViewModel.loadFile(selectedItem, new AlistDriveViewModel.LoadFileCallback() {
-                        @Override
-                        public void callback(String fileUrl) {
-                            mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    playFileOn3rdPlayer(value, fileUrl, null);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void fail(String msg) {
-                            mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast toast = Toast.makeText(mContext, msg,Toast.LENGTH_SHORT);
-                                    toast.show();
-                                }
-                            });
-                        }
-                    });
-                }
-                thirdPlayerDialog.dismiss();
-                thirdPlayerDialog = null;
-            }
-
-            @Override
-            public String getDisplay(Integer val) {
-                return PlayerHelper.get3rdPlayerName(val);
-            }
-        }, new DiffUtil.ItemCallback<Integer>() {
-            @Override
-            public boolean areItemsTheSame(@NonNull @NotNull Integer oldItem, @NonNull @NotNull Integer newItem) {
-                return oldItem.intValue() == newItem.intValue();
-            }
-
-            @Override
-            public boolean areContentsTheSame(@NonNull @NotNull Integer oldItem, @NonNull @NotNull Integer newItem) {
-                return oldItem.intValue() == newItem.intValue();
-            }
-        }, Arrays.asList(types), defaultPos);
-        thirdPlayerDialog.show();
-    }
-
-    private void playFileOn3rdPlayer(int playerType, String url, HashMap<String, String> playingHeader) {
-        boolean callResult = PlayerHelper.playOn3rdPlayer(playerType, DriveActivity.this, url, url, null, playingHeader);
-        if(callResult) {
-            Toast toast = Toast.makeText(mContext, "调用外部播放器成功",Toast.LENGTH_SHORT);
-            toast.show();
-        } else {
-            Toast toast = Toast.makeText(mContext, "调用外部播放器失败",Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
-
     private void openSortDialog() {
-        List<String> options = Arrays.asList(new String[] { "按名字升序", "按名字降序", "按修改时间升序", "按修改时间降序" });
+        List<String> options = Arrays.asList(new String[]{"按名字升序", "按名字降序", "按修改时间升序", "按修改时间降序"});
         int sort = Hawk.get(HawkConfig.STORAGE_DRIVE_SORT, 0);
         SelectDialog<String> dialog = new SelectDialog<>(DriveActivity.this);
         dialog.setTip("请选择列表排序方式");
@@ -466,30 +344,30 @@ public class DriveActivity extends BaseActivity {
     };
 
     private void openFilePicker() {
-        if(delMode)
+        if (delMode)
             toggleDelMode();
         ChooserDialog dialog = new ChooserDialog(mContext, R.style.FileChooserStyle);
         dialog
-            .withStringResources("选择一个文件夹", "确定", "取消")
-            .titleFollowsDir(true)
-            .displayPath(true)
-            .enableDpad(true)
-            .withFilter(true, true)
-            .withChosenListener(new ChooserDialog.Result() {
-                @Override
-                public void onChoosePath(String dir, File dirFile) {
-                    String absPath = dirFile.getAbsolutePath();
-                    for(DriveFolderFile drive : drives) {
-                        if(drive.getDriveType() == StorageDriveType.TYPE.LOCAL && absPath.equals(drive.getDriveData().name)) {
-                            Toast.makeText(mContext, "此文件夹之前已被添加到空间列表！", Toast.LENGTH_SHORT).show();
-                            return;
+                .withStringResources("选择一个文件夹", "确定", "取消")
+                .titleFollowsDir(true)
+                .displayPath(true)
+                .enableDpad(true)
+                .withFilter(true, true)
+                .withChosenListener(new ChooserDialog.Result() {
+                    @Override
+                    public void onChoosePath(String dir, File dirFile) {
+                        String absPath = dirFile.getAbsolutePath();
+                        for (DriveFolderFile drive : drives) {
+                            if (drive.getDriveType() == StorageDriveType.TYPE.LOCAL && absPath.equals(drive.getDriveData().name)) {
+                                Toast.makeText(mContext, "此文件夹之前已被添加到空间列表！", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                         }
+                        RoomDataManger.insertDriveRecord(absPath, StorageDriveType.TYPE.LOCAL, null);
+                        EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_DRIVE_REFRESH));
+                        return;
                     }
-                    RoomDataManger.insertDriveRecord(absPath, StorageDriveType.TYPE.LOCAL, null);
-                    EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_DRIVE_REFRESH));
-                    return;
-                }
-            }).show();
+                }).show();
     }
 
     private void openWebdavDialog(StorageDrive drive) {
@@ -504,7 +382,7 @@ public class DriveActivity extends BaseActivity {
 
     public void toggleDelMode() {
         delMode = !delMode;
-        if(delMode) {
+        if (delMode) {
             this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_FF0057));
         } else {
             this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_FFFFFF));
@@ -513,16 +391,15 @@ public class DriveActivity extends BaseActivity {
     }
 
     private void initData() {
-        this.txtTitle.setText("存储空间");
+        this.txtTitle.setText(getString(R.string.act_drive));
         sortType = Hawk.get(HawkConfig.STORAGE_DRIVE_SORT, 0);
         btnSort.setVisibility(View.GONE);
-        btnSearch.setVisibility(View.VISIBLE);
-        if(drives == null) {
+        if (drives == null) {
             drives = new ArrayList<>();
             List<StorageDrive> storageDrives = RoomDataManger.getAllDrives();
             for (StorageDrive storageDrive : storageDrives) {
                 DriveFolderFile drive = new DriveFolderFile(storageDrive);
-                if(delMode)
+                if (delMode)
                     drive.isDelMode = true;
                 drives.add(drive);
             }
@@ -535,8 +412,8 @@ public class DriveActivity extends BaseActivity {
     }
 
     private void setSelectedItem(List<DriveFolderFile> list) {
-        for(int i=0; i< list.size(); i++) {
-            if(list.get(i).isSelected) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).isSelected) {
                 int isIndex = i;
                 mHandler.postDelayed(new Runnable() {
                     @Override
@@ -561,7 +438,7 @@ public class DriveActivity extends BaseActivity {
                     @Override
                     public void run() {
                         showSuccess();
-                        if(alreadyHasChildren) {
+                        if (alreadyHasChildren) {
                             adapter.setNewData(viewModel.getCurrentDriveNote().getChildren());
                             setSelectedItem(viewModel.getCurrentDriveNote().getChildren());
                         } else {
@@ -598,18 +475,18 @@ public class DriveActivity extends BaseActivity {
         btnSort.setVisibility(View.GONE);
         showLoading();
         List<AbstractDriveViewModel> viewModels = new ArrayList<>();
-        if(viewModel != null)
+        if (viewModel != null)
             viewModels.add(viewModel);
         else {
-            for(DriveFolderFile drive : drives) {
+            for (DriveFolderFile drive : drives) {
                 AbstractDriveViewModel searchViewModel = null;
-                if(drive.getDriveType() == StorageDriveType.TYPE.LOCAL)
+                if (drive.getDriveType() == StorageDriveType.TYPE.LOCAL)
                     searchViewModel = new LocalDriveViewModel();
-                else if(drive.getDriveType() == StorageDriveType.TYPE.WEBDAV)
+                else if (drive.getDriveType() == StorageDriveType.TYPE.WEBDAV)
                     searchViewModel = new WebDAVDriveViewModel();
-                else if(drive.getDriveType() == StorageDriveType.TYPE.ALISTWEB)
+                else if (drive.getDriveType() == StorageDriveType.TYPE.ALISTWEB)
                     searchViewModel = new AlistDriveViewModel();
-                if(searchViewModel != null) {
+                if (searchViewModel != null) {
                     allSearchCount.incrementAndGet();
                     searchViewModel.setCurrentDrive(drive);
                     viewModels.add(searchViewModel);
@@ -623,7 +500,7 @@ public class DriveActivity extends BaseActivity {
         adapter.setNewData(searchResult);
         adapter.setFooterView(footLoading);
         Object syncLocker = new Object();
-        for(AbstractDriveViewModel searchViewModel : viewModels) {
+        for (AbstractDriveViewModel searchViewModel : viewModels) {
             Runnable runnable = searchViewModel.search(keyword, new AbstractDriveViewModel.LoadDataCallback() {
                 @Override
                 public void callback(List<DriveFolderFile> list, boolean alreadyHasChildren) {
@@ -642,7 +519,7 @@ public class DriveActivity extends BaseActivity {
                                         searchResult.addAll(list);
                                         adapter.notifyDataSetChanged();
                                     }
-                                }catch (Exception ex) {
+                                } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
                             }
@@ -671,12 +548,12 @@ public class DriveActivity extends BaseActivity {
     }
 
     private void returnPreviousFolder() {
-        if(isInSearch && viewModel == null) {
+        if (isInSearch && viewModel == null) {
             //if already in search list
             isInSearch = false;
             viewModel = backupViewModel;
             backupViewModel = null;
-            if(viewModel == null) {
+            if (viewModel == null) {
                 //if no last view list, return to main menu
                 initData();
             } else {
@@ -687,8 +564,8 @@ public class DriveActivity extends BaseActivity {
         }
         viewModel.getCurrentDriveNote().setChildren(null);
         viewModel.setCurrentDriveNote(viewModel.getCurrentDriveNote().parentFolder);
-        if(viewModel.getCurrentDriveNote() == null) {
-            if(isInSearch) {
+        if (viewModel.getCurrentDriveNote() == null) {
+            if (isInSearch) {
                 //if returns from a search result, back to search result
                 this.txtTitle.setText("搜索结果");
                 adapter.setNewData(searchResult);
@@ -704,21 +581,12 @@ public class DriveActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if(thirdPlayerDialog != null) {
-            thirdPlayerDialog.dismiss();
-            thirdPlayerDialog = null;
-            return;
-        }
-        if(viewModel != null) {
+        if (viewModel != null) {
             cancel();
             mGridView.onClick(mGridView.getChildAt(0));
             return;
-        } else if(isInSearch) {
-            isInSearch = false;
-            initData();
-            return;
         }
-        if(!delMode)
+        if (!delMode)
             super.onBackPressed();
         else
             toggleDelMode();
@@ -735,10 +603,6 @@ public class DriveActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (searchExecutorService != null) {
-            searchExecutorService.shutdownNow();
-            searchExecutorService = null;
-        }
         EventBus.getDefault().unregister(this);
     }
 }
