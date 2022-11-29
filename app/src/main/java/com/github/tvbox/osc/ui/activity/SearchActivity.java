@@ -75,7 +75,6 @@ public class SearchActivity extends BaseActivity {
     SourceViewModel sourceViewModel;
     private EditText etSearch;
     private TextView tvSearch;
-    private TextView tvClear;
     private SearchKeyboard keyboard;
     private TextView tvAddress;
     private ImageView ivQRCode;
@@ -83,7 +82,6 @@ public class SearchActivity extends BaseActivity {
     private PinyinAdapter wordAdapter;
     private String searchTitle = "";
     private TextView tvSearchCheckboxBtn;
-
     private static HashMap<String, String> mCheckSources = null;
     private SearchCheckboxDialog mSearchCheckboxDialog = null;
 
@@ -158,7 +156,7 @@ public class SearchActivity extends BaseActivity {
         etSearch = findViewById(R.id.etSearch);
         tvSearch = findViewById(R.id.tvSearch);
         tvSearchCheckboxBtn = findViewById(R.id.tvSearchCheckboxBtn);
-        tvClear = findViewById(R.id.tvClear);
+        
         tvAddress = findViewById(R.id.tvAddress);
         ivQRCode = findViewById(R.id.ivQRCode);
         mGridView = findViewById(R.id.mGridView);
@@ -219,13 +217,7 @@ public class SearchActivity extends BaseActivity {
                 }
             }
         });
-        tvClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FastClickCheckUtil.check(v);
-                etSearch.setText("");
-            }
-        });
+
 //        etSearch.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -256,8 +248,8 @@ public class SearchActivity extends BaseActivity {
                         loadRec(text);
                     }
                 } else if (pos == 0) {
-                    RemoteDialog remoteDialog = new RemoteDialog(mContext);
-                    remoteDialog.show();
+                FastClickCheckUtil.check(v);
+                etSearch.setText("");
                 }
             }
         });
