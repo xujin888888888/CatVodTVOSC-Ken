@@ -59,6 +59,8 @@
             android:id="@+id/mGridView"
             android:overScrollMode="never"
             android:overScrollMode="never"
+            app:tv_selectedItemIsCentered="true"
+            app:tv_verticalSpacingWithMargins="@dimen/vs_10"
             android:scrollbars="none"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
