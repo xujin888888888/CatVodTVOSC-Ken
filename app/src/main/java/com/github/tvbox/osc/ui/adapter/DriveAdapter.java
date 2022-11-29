@@ -1,8 +1,6 @@
 package com.github.tvbox.osc.ui.adapter;
 
-import android.text.TextUtils;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -10,23 +8,13 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.github.tvbox.osc.R;
-import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.bean.DriveFolderFile;
-import com.github.tvbox.osc.bean.VodInfo;
-import com.github.tvbox.osc.picasso.RoundTransformation;
 import com.github.tvbox.osc.ui.dialog.AlistDriveDialog;
 import com.github.tvbox.osc.ui.dialog.WebdavDialog;
-import com.github.tvbox.osc.util.DefaultConfig;
-import com.github.tvbox.osc.util.MD5;
 import com.github.tvbox.osc.util.StorageDriveType;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
-import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-
-import me.jessyan.autosize.utils.AutoSizeUtils;
 
 /**
  * @author pj567
@@ -48,7 +36,7 @@ public class DriveAdapter extends BaseQuickAdapter<DriveFolderFile, BaseViewHold
             DriveFolderFile item = this.getItem(pos);
             item.isDelMode = isDelMode;
             if(item.getDriveType() == StorageDriveType.TYPE.WEBDAV
-                || item.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
+                    || item.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
                 this.getViewByPosition(pos, R.id.imgConfig).setVisibility(isDelMode ? View.GONE : View.VISIBLE);
             }
         }
