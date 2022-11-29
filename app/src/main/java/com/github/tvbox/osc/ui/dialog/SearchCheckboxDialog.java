@@ -17,6 +17,7 @@ import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
 
 import org.jetbrains.annotations.NotNull;
+import me.jessyan.autosize.utils.AutoSizeUtils;
 
 import java.util.HashMap;
 import java.util.List;
