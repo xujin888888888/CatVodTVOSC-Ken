@@ -248,7 +248,7 @@ public class SearchActivity extends BaseActivity {
                         loadRec(text);
                     }
                 } else if (pos == 0) {
-                FastClickCheckUtil.check(v);
+                FastClickCheckUtil.check(view);
                 etSearch.setText("");
                 }
             }
