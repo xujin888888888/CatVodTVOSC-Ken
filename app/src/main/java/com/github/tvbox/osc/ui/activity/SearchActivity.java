@@ -1,10 +1,16 @@
 package com.github.tvbox.osc.ui.activity;
 
-import android.content.Intent;
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,11 +37,9 @@ import com.github.tvbox.osc.ui.tv.QRCodeGen;
 import com.github.tvbox.osc.ui.tv.widget.SearchKeyboard;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.VodSearch;
+import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.SearchHelper;
-import com.github.tvbox.osc.js.JSEngine;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -53,7 +57,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -83,17 +86,15 @@ public class SearchActivity extends BaseActivity {
 
     private static HashMap<String, String> mCheckSources = null;
     private SearchCheckboxDialog mSearchCheckboxDialog = null;
-    private View footLoading = null;
-    private VodSearch vodSearch;
 
     @Override
     protected int getLayoutResID() {
         return R.layout.activity_search;
     }
-    
+
+
     private static Boolean hasKeyBoard;
     private static Boolean isSearchBack;
-
     @Override
     protected void init() {
         initView();
@@ -102,20 +103,44 @@ public class SearchActivity extends BaseActivity {
         hasKeyBoard = true;
         isSearchBack = false;
     }
-    
+
+    /*
+     * 禁止软键盘
+     * @param activity Activity
+     */
+    public static void disableKeyboard(Activity activity) {
+        hasKeyBoard = false;
+        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+
+    /*
+     * 启用软键盘
+     * @param activity Activity
+     */
+    public static void enableKeyboard(Activity activity) {
+        hasKeyBoard = true;
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+
+    public void openSystemKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(this.getCurrentFocus(), InputMethodManager.SHOW_FORCED);
+    }
+
     private List<Runnable> pauseRunnable = null;
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (vodSearch != null && pauseRunnable != null && pauseRunnable.size() > 0) {
-            vodSearch.StartNewSearchService();
-            vodSearch.getAllRunCount().set(pauseRunnable.size());
+        if (pauseRunnable != null && pauseRunnable.size() > 0) {
+            searchExecutorService = Executors.newFixedThreadPool(5);
+            allRunCount.set(pauseRunnable.size());
             for (Runnable runnable : pauseRunnable) {
-                vodSearch.getSearchExecutorService().execute(runnable);
+                searchExecutorService.execute(runnable);
             }
             pauseRunnable.clear();
             pauseRunnable = null;
+        }
         if (hasKeyBoard) {
             tvSearch.requestFocus();
             tvSearch.requestFocusFromTouch();
@@ -126,7 +151,7 @@ public class SearchActivity extends BaseActivity {
             }
         }
     }
-}
+
     private void initView() {
         EventBus.getDefault().register(this);
         llLayout = findViewById(R.id.llLayout);
@@ -143,9 +168,6 @@ public class SearchActivity extends BaseActivity {
         mGridViewWord.setLayoutManager(new V7LinearLayoutManager(this.mContext, 1, false));
         wordAdapter = new PinyinAdapter();
         mGridViewWord.setAdapter(wordAdapter);
-        footLoading = getLayoutInflater().inflate(R.layout.item_search_lite, null);
-        footLoading.findViewById(R.id.tvName).setVisibility(View.GONE);
-        footLoading.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
         wordAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -168,9 +190,8 @@ public class SearchActivity extends BaseActivity {
                 Movie.Video video = searchAdapter.getData().get(position);
                 if (video != null) {
                     try {
-                        if (vodSearch.getSearchExecutorService() != null) {
-                            pauseRunnable = vodSearch.getSearchExecutorService().shutdownNow();
-                           JSEngine.getInstance().stopAll();
+                        if (searchExecutorService != null) {
+                            pauseRunnable = searchExecutorService.shutdownNow();
                             searchExecutorService = null;
                         }
                     } catch (Throwable th) {
@@ -189,6 +210,7 @@ public class SearchActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
+                hasKeyBoard = true;
                 String wd = etSearch.getText().toString().trim();
                 if (!TextUtils.isEmpty(wd)) {
                     search(wd);
@@ -204,29 +226,43 @@ public class SearchActivity extends BaseActivity {
                 etSearch.setText("");
             }
         });
+//        etSearch.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                enableKeyboard(SearchActivity.this);
+//                openSystemKeyBoard();//再次尝试拉起键盘
+//                SearchActivity.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+//            }
+//        });
+
+//        etSearch.setOnFocusChangeListener(tvSearchFocusChangeListener);
         keyboard.setOnSearchKeyListener(new SearchKeyboard.OnSearchKeyListener() {
             @Override
             public void onSearchKey(int pos, String key) {
-                if (pos > 0) {
+                if (pos > 1) {
                     String text = etSearch.getText().toString().trim();
                     text += key;
                     etSearch.setText(text);
-                } else if (pos == 0) {
+                    if (text.length() > 0) {
+                        loadRec(text);
+                    }
+                } else if (pos == 1) {
                     String text = etSearch.getText().toString().trim();
                     if (text.length() > 0) {
                         text = text.substring(0, text.length() - 1);
                         etSearch.setText(text);
                     }
-                }
-                if(etSearch.getText().length() <= 0) {
-                    loadHotSearch();
-                } else {
-                    loadRec(etSearch.getText().toString());
+                    if (text.length() > 0) {
+                        loadRec(text);
+                    }
+                } else if (pos == 0) {
+                    RemoteDialog remoteDialog = new RemoteDialog(mContext);
+                    remoteDialog.show();
                 }
             }
         });
         setLoadSir(llLayout);
-                tvSearchCheckboxBtn.setOnClickListener(new View.OnClickListener() {
+        tvSearchCheckboxBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mSearchCheckboxDialog == null) {
@@ -252,14 +288,41 @@ public class SearchActivity extends BaseActivity {
 
     private void initViewModel() {
         sourceViewModel = new ViewModelProvider(this).get(SourceViewModel.class);
-        vodSearch = new VodSearch(sourceViewModel);
     }
 
     /**
      * 拼音联想
      */
     private void loadRec(String key) {
-        wordAdapter.setNewData(new ArrayList<>());
+//        OkGo.<String>get("https://s.video.qq.com/smartbox")
+//                .params("plat", 2)
+//                .params("ver", 0)
+//                .params("num", 20)
+//                .params("otype", "json")
+//                .params("query", key)
+//                .execute(new AbsCallback<String>() {
+//                    @Override
+//                    public void onSuccess(Response<String> response) {
+//                        try {
+//                            ArrayList<String> hots = new ArrayList<>();
+//                            String result = response.body();
+//                            JsonObject json = JsonParser.parseString(result.substring(result.indexOf("{"), result.lastIndexOf("}") + 1)).getAsJsonObject();
+//                            JsonArray itemList = json.get("item").getAsJsonArray();
+//                            for (JsonElement ele : itemList) {
+//                                JsonObject obj = (JsonObject) ele;
+//                                hots.add(obj.get("word").getAsString().trim().replaceAll("<|>|《|》|-", "").split(" ")[0]);
+//                            }
+//                            wordAdapter.setNewData(hots);
+//                        } catch (Throwable th) {
+//                            th.printStackTrace();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public String convertResponse(okhttp3.Response response) throws Throwable {
+//                        return response.body().string();
+//                    }
+//                });
         OkGo.<String>get("https://suggest.video.iqiyi.com/")
                 .params("if", "mobile")
                 .params("key", key)
@@ -269,11 +332,11 @@ public class SearchActivity extends BaseActivity {
                         try {
                             ArrayList<String> hots = new ArrayList<>();
                             String result = response.body();
-                            JsonObject json = JsonParser.parseString(result.substring(result.indexOf("{"), result.lastIndexOf("}") + 1)).getAsJsonObject();
+                            JsonObject json = JsonParser.parseString(result).getAsJsonObject();
                             JsonArray itemList = json.get("data").getAsJsonArray();
                             for (JsonElement ele : itemList) {
                                 JsonObject obj = (JsonObject) ele;
-                                hots.add(obj.get("name").getAsString().trim());
+                                hots.add(obj.get("name").getAsString().trim().replaceAll("<|>|《|》|-", ""));
                             }
                             wordAdapter.setNewData(hots);
                         } catch (Throwable th) {
@@ -289,10 +352,8 @@ public class SearchActivity extends BaseActivity {
     }
 
     private void initData() {
-        if(Hawk.get(HawkConfig.REMOTE_CONTROL, true))
-            refreshQRCode();
-        else
-            findViewById(R.id.remoteRoot).setVisibility(View.GONE);
+        refreshQRCode();
+        initCheckedSourcesForSearch();
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("title")) {
             String title = intent.getStringExtra("title");
@@ -300,12 +361,9 @@ public class SearchActivity extends BaseActivity {
             search(title);
         }
         // 加载热词
-        loadHotSearch();
-    }
-
-    //load hot search
-    private void loadHotSearch() {
         OkGo.<String>get("https://node.video.qq.com/x/api/hot_search")
+//        OkGo.<String>get("https://api.web.360kan.com/v1/rank")
+//                .params("cat", "1")
                 .params("channdlId", "0")
                 .params("_", System.currentTimeMillis())
                 .execute(new AbsCallback<String>() {
@@ -313,22 +371,12 @@ public class SearchActivity extends BaseActivity {
                     public void onSuccess(Response<String> response) {
                         try {
                             ArrayList<String> hots = new ArrayList<>();
-                            JsonObject mapResult = JsonParser.parseString(response.body())
-                                    .getAsJsonObject()
-                                    .get("data").getAsJsonObject()
-                                    .get("mapResult").getAsJsonObject();
-                            List<String> groupIndex = Arrays.asList("0", "1", "2", "3", "5");
-                            for(String index : groupIndex) {
-                                JsonArray itemList = mapResult.get(index).getAsJsonObject()
-                                        .get("listInfo").getAsJsonArray();
-                                for (JsonElement ele : itemList) {
-                                    JsonObject obj = (JsonObject) ele;
-                                    String hotKey = obj.get("title").getAsString().trim().replaceAll("<|>|《|》|-", "").split(" ")[0];
-                                    if(!hots.contains(hotKey))
-                                        hots.add(hotKey);
-                                }
+                            JsonArray itemList = JsonParser.parseString(response.body()).getAsJsonObject().get("data").getAsJsonObject().get("mapResult").getAsJsonObject().get("0").getAsJsonObject().get("listInfo").getAsJsonArray();
+//                            JsonArray itemList = JsonParser.parseString(response.body()).getAsJsonObject().get("data").getAsJsonArray();
+                            for (JsonElement ele : itemList) {
+                                JsonObject obj = (JsonObject) ele;
+                                hots.add(obj.get("title").getAsString().trim().replaceAll("<|>|《|》|-", "").split(" ")[0]);
                             }
-
                             wordAdapter.setNewData(hots);
                         } catch (Throwable th) {
                             th.printStackTrace();
@@ -340,12 +388,13 @@ public class SearchActivity extends BaseActivity {
                         return response.body().string();
                     }
                 });
+
     }
 
     private void refreshQRCode() {
         String address = ControlManager.get().getAddress(false);
         tvAddress.setText(String.format("远程搜索使用手机/电脑扫描下面二维码或者直接浏览器访问地址\n%s", address));
-        ivQRCode.setImageBitmap(QRCodeGen.generateBitmap(address, 300, 300));
+        ivQRCode.setImageBitmap(QRCodeGen.generateBitmap(address + "search.html", 300, 300));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -367,28 +416,22 @@ public class SearchActivity extends BaseActivity {
             }
         }
     }
-    
-    
+
     private void initCheckedSourcesForSearch() {
         mCheckSources = SearchHelper.getSourcesForSearch();
     }
-    
-       public static void setCheckedSourcesForSearch(HashMap<String,String> checkedSources) {
+
+    public static void setCheckedSourcesForSearch(HashMap<String,String> checkedSources) {
         mCheckSources = checkedSources;
     }
-
 
     private void search(String title) {
         cancel();
         showLoading();
-        JsonObject startJson = new JsonObject();
-        startJson.addProperty("type", "search");
-        startJson.addProperty("action", "start");
-        ControlManager.get().getSocketServer().sendToAll(startJson);
         this.searchTitle = title;
         mGridView.setVisibility(View.INVISIBLE);
         searchAdapter.setNewData(new ArrayList<>());
-        vodSearch.searchResult(searchTitle, false);
+        searchResult();
     }
 
     private ExecutorService searchExecutorService = null;
@@ -398,7 +441,6 @@ public class SearchActivity extends BaseActivity {
         try {
             if (searchExecutorService != null) {
                 searchExecutorService.shutdownNow();
-                JSEngine.getInstance().stopAll();
                 searchExecutorService = null;
             }
         } catch (Throwable th) {
@@ -440,43 +482,43 @@ public class SearchActivity extends BaseActivity {
         }
     }
 
+    private boolean matchSearchResult(String name, String searchTitle) {
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(searchTitle)) return false;
+        searchTitle = searchTitle.trim();
+        String[] arr = searchTitle.split("\\s+");
+        int matchNum = 0;
+        for(String one : arr) {
+            if (name.contains(one)) matchNum++;
+        }
+        return matchNum == arr.length ? true : false;
+    }
 
     private void searchData(AbsXml absXml) {
         if (absXml != null && absXml.movie != null && absXml.movie.videoList != null && absXml.movie.videoList.size() > 0) {
             List<Movie.Video> data = new ArrayList<>();
             for (Movie.Video video : absXml.movie.videoList) {
-                if (video.name.contains(searchTitle))
-                    data.add(video);
+                if (matchSearchResult(video.name, searchTitle)) data.add(video);
             }
-            JsonObject endJson = new JsonObject();
-            endJson.addProperty("type", "search");
-            endJson.add("results", JsonParser.parseString((new Gson()).toJson(data)));
-            ControlManager.get().getSocketServer().sendToAll(endJson);
             if (searchAdapter.getData().size() > 0) {
                 searchAdapter.addData(data);
             } else {
                 showSuccess();
                 mGridView.setVisibility(View.VISIBLE);
                 searchAdapter.setNewData(data);
-                searchAdapter.addFooterView(footLoading);
             }
         }
 
-        int count = vodSearch.getAllRunCount().decrementAndGet();
+        int count = allRunCount.decrementAndGet();
         if (count <= 0) {
             if (searchAdapter.getData().size() <= 0) {
                 showEmpty();
             }
-            searchAdapter.removeFooterView(footLoading);
             cancel();
         }
     }
 
+
     private void cancel() {
-        JsonObject endJson = new JsonObject();
-        endJson.addProperty("type", "search");
-        endJson.addProperty("action", "end");
-        ControlManager.get().getSocketServer().sendToAll(endJson);
         OkGo.getInstance().cancelTag("search");
     }
 
@@ -487,7 +529,6 @@ public class SearchActivity extends BaseActivity {
         try {
             if (searchExecutorService != null) {
                 searchExecutorService.shutdownNow();
-                JSEngine.getInstance().stopAll();
                 searchExecutorService = null;
             }
         } catch (Throwable th) {
