@@ -57,6 +57,9 @@
                 
         <com.owen.tvrecyclerview.widget.TvRecyclerView
             android:id="@+id/mGridView"
+            android:overScrollMode="never"
+            android:overScrollMode="never"
+            android:scrollbars="none"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"/>
