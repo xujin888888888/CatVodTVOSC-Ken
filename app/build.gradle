@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId 'com.github.tvbox.osc.km'
         minSdkVersion 18
-        targetSdkVersion 26
+        targetSdkVersion 30
         versionCode 2
         versionName '0.8.20220915'
         multiDexEnabled true
@@ -88,7 +88,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.android.material:material:1.4.0'
-    implementation files('libs\\thunder.jar','libs\\pyramid.aar','libs\\exo-extension-ffmpeg.aar','libs\\commons-lang3-3.12.0.jar','libs\\exo-extension-okhttp.aar')
+    implementation files('libs\\thunder.jar','libs\\pyramid.aar','libs\\xwalk_shared_library-23.53.589.4.aar','libs\\exo-extension-ffmpeg.aar','libs\\commons-lang3-3.12.0.jar','libs\\exo-extension-okhttp.aar')
     
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     annotationProcessor 'androidx.room:room-compiler:2.3.0'
@@ -109,9 +109,9 @@ dependencies {
 
     implementation project(":player")
 
-    implementation('org.xwalk:xwalk_shared_library:23.53.589.4') {
-        exclude group: 'com.android.support'
-    }
+//    implementation('org.xwalk:xwalk_shared_library:23.53.589.4') {
+//        exclude group: 'com.android.support'
+//    }
     implementation 'com.lzy.net:okgo:3.0.4'
     // implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
     implementation 'com.owen:tv-recyclerview:3.0.0'
