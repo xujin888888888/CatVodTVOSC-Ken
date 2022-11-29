@@ -40,9 +40,8 @@
                 
            <TextView
                 android:id="@+id/tvSearchCheckboxBtn"
-                android:layout_width="match_parent"
+                android:layout_width="0mm"
                 android:layout_height="@dimen/vs_50"
-                android:layout_marginTop="@dimen/vs_10"
                 android:layout_weight="1"
                 android:background="@drawable/shape_user_focus"
                 android:focusable="true"
