@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:padding="@dimen/vs_5"
-        android:background="@drawable/shape_dialog_pg_search_checkbox"
+        android:background="@drawable/shape_dialog_bg_main"
         android:orientation="vertical">
 
 
@@ -17,7 +17,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_gravity="center_horizontal">
             <TextView
                 android:id="@+id/checkAll"
                 android:layout_width="@dimen/vs_150"
@@ -50,8 +50,9 @@
 
             <LinearLayout
             android:orientation="horizontal"
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal"
             android:layout_width="match_parent"
+            android:paddingTop="@dimen/vs_5"
             android:layout_height="wrap_content">
                 
         <com.owen.tvrecyclerview.widget.TvRecyclerView
