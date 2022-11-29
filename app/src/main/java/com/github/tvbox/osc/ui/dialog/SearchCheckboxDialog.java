@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.bean.SourceBean;
-import com.github.tvbox.osc.ui.adapter.CheckboxSearchAdapter;
+import com.github.tvbox.osc.ui.adapter.ChbSearchAdapter;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
@@ -24,7 +24,7 @@ import java.util.List;
 public class SearchCheckboxDialog extends BaseDialog{
 
     private TvRecyclerView mGridView;
-    private CheckboxSearchAdapter checkboxSearchAdapter;
+    private ChbSearchAdapter checkboxSearchAdapter;
     private final List<SourceBean> mSourceList;
     TextView checkAll;
     TextView clearAll;
@@ -54,7 +54,7 @@ public class SearchCheckboxDialog extends BaseDialog{
         mGridView = findViewById(R.id.mGridView);
         checkAll = findViewById(R.id.checkAll);
         clearAll = findViewById(R.id.clearAll);
-        checkboxSearchAdapter = new CheckboxSearchAdapter(new DiffUtil.ItemCallback<SourceBean>() {
+        checkboxSearchAdapter = new ChbSearchAdapter(new DiffUtil.ItemCallback<SourceBean>() {
             @Override
             public boolean areItemsTheSame(@NonNull SourceBean oldItem, @NonNull SourceBean newItem) {
                 return oldItem.getKey().equals(newItem.getKey());
