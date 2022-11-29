@@ -11,7 +11,6 @@
     android:paddingRight="@dimen/vs_20"
     android:paddingBottom="@dimen/vs_10">
 
-
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -28,6 +27,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="空间名称"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText
@@ -59,6 +59,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="Alist地址"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText
@@ -89,6 +90,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="初始路径"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText
@@ -119,6 +121,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="密码"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText

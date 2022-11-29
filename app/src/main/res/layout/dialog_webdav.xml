@@ -28,6 +28,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="空间名称"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText
@@ -59,6 +60,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="WebDAV地址"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText
@@ -89,6 +91,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="初始路径"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText
@@ -119,6 +122,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="用户名"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText
@@ -149,6 +153,7 @@
                 android:layout_marginRight="@dimen/vs_20"
                 android:gravity="center_vertical|end"
                 android:text="密码"
+                android:textColor="@color/color_FF000000"
                 android:textSize="@dimen/ts_20" />
 
             <EditText
