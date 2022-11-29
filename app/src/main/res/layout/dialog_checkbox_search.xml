@@ -58,7 +58,7 @@
         <com.owen.tvrecyclerview.widget.TvRecyclerView
             android:id="@+id/mGridView"
             android:overScrollMode="never"
-            android:overScrollMode="never"
+            android:scrollbars="none"
             app:tv_selectedItemIsCentered="true"
             app:tv_verticalSpacingWithMargins="@dimen/vs_10"
             android:scrollbars="none"
