@@ -67,6 +67,7 @@ public class SearchCheckboxDialog extends BaseDialog{
         });
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(new V7LinearLayoutManager(getContext(), 1, false));
+        mGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(getContext(), 10.0f));
         mGridView.setAdapter(checkboxSearchAdapter);
         checkboxSearchAdapter.setData(mSourceList, mCheckSourcees);
         int pos = 0;
