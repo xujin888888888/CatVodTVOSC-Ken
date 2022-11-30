@@ -20,6 +20,6 @@
             android:paddingRight="@dimen/vs_20"
             android:textSize="@dimen/ts_24"
             android:text="1111"
-            style="@style/CheckBox"/>
+            />
     </LinearLayout>
 </FrameLayout>
