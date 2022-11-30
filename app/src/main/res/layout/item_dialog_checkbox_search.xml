@@ -12,7 +12,6 @@
         <CheckBox
             android:id="@+id/oneSearchSource"
             android:textColor="@color/color_FF323232"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_dialog_new"
             android:clickable="true"
