@@ -345,7 +345,7 @@ public class ApiConfig {
             else
                 setSourceBean(sh);
         }
-        JSEngine.getInstance().clear();
+        
         // 需要使用vip解析的flag
         vipParseFlags = DefaultConfig.safeJsonStringList(infoJson, "flags");
         // 解析地址
