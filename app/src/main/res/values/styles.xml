@@ -66,9 +66,9 @@
     <item name="android:button">@drawable/checkbox_selector</item>
    <item name="android:paddingLeft">10.0dp</item>
     <item name="android:maxHeight">50dp</item>
-    <item name="android:layout_marginRight">@dimen/fab_margin</item>
-    <item name="android:layout_marginLeft">@dimen/fab_margin</item>
-    <item name="android:layout_marginTop">@dimen/fab_margin</item>
+    <item name="android:layout_marginRight">@dimen/vs_20</item>
+    <item name="android:layout_marginLeft">@dimen/vs_20</item>
+    <item name="android:layout_marginTop">@dimen/vs_10</item>
     <item name="android:gravity">end|center_vertical</item>
     <item name="android:textSize">15sp</item>
     <item name="android:layoutDirection">rtl</item>
