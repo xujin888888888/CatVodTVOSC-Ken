@@ -9,7 +9,6 @@
         android:layout_gravity="center_vertical"
         android:layout_width="@dimen/vs_420"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
         android:padding="@dimen/vs_5"
         android:background="@drawable/shape_dialog_bg_main"
         android:orientation="vertical">
@@ -35,8 +34,8 @@
                 android:text="全都选"
                 android:layout_weight="1.0" />
             <View
-                android:gravity="0x00000011"
-                android:layout_gravity="0x00000011"
+                android:layout_gravity="center"
+                android:gravity="center"
                 android:background="@color/color_FF323232"
                 android:layout_width="1dp"
                 android:layout_height="20dp" />
