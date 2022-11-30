@@ -5,7 +5,6 @@ import androidx.multidex.MultiDexApplication;
 import com.github.tvbox.osc.callback.EmptyCallback;
 import com.github.tvbox.osc.callback.LoadingCallback;
 import com.github.tvbox.osc.data.AppDataManager;
-import com.github.tvbox.osc.js.JSEngine;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.util.AppManager;
 import com.github.tvbox.osc.util.EpgUtil;
@@ -14,6 +13,7 @@ import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.kingja.loadsir.core.LoadSir;
 import com.orhanobut.hawk.Hawk;
+import com.github.tvbox.osc.util.js.JSEngine;
 import com.github.catvod.crawler.SpiderNull;
 import com.undcover.freedom.pyramid.PythonLoader;
 import me.jessyan.autosize.AutoSizeConfig;
@@ -49,6 +49,7 @@ public class App extends MultiDexApplication {
                 .setSupportSubunits(Subunits.MM);
         PlayerHelper.init();
         EpgUtil.init();
+        JSEngine.getInstance().create();
             //pyramid-add-start
 	PythonLoader.getInstance().setApplication(this);
     //pyramid-add-end
@@ -69,7 +70,7 @@ public class App extends MultiDexApplication {
 @Override
     public void onTerminate() {
         super.onTerminate();
-        JSEngine.getInstance().stopAll();
+        JSEngine.getInstance().destroy();
     }
     
         
