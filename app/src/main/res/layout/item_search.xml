@@ -2,9 +2,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/shape_user_focus"
+    android:background="@drawable/shape_pic_focus"
     android:focusable="true"
-    android:padding="@dimen/vs_1">
+    android:padding="@dimen/vs_3">
 
     <FrameLayout
         android:layout_width="@dimen/vs_214"
