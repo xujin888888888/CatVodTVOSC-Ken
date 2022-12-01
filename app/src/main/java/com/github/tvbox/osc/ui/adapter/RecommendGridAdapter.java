@@ -145,7 +145,7 @@ public class RecommendGridAdapter extends BaseQuickAdapter<Movie.Video, BaseView
                             .transform(new RoundTransformation(MD5.string2MD5(item.pic + "position=" + helper.getLayoutPosition()))
                                     .centerCorp(true)
                                     .override(ivThumb.getWidth(), ivThumb.getHeight())
-                                    .roundRadius(AutoSizeUtils.mm2px(mContext, 10), RoundTransformation.RoundType.LEFT))
+                                    .roundRadius(AutoSizeUtils.mm2px(mContext, 5), RoundTransformation.RoundType.LEFT))
                             .placeholder(R.drawable.img_loading_placeholder)
                             .error(R.drawable.img_loading_placeholder)
                             .into(ivThumb);

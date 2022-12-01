@@ -112,8 +112,8 @@ public class HomeCatAdapter extends BaseQuickAdapter<HomeCatBean, BaseViewHolder
         @Override
         public void onFocusChange(View view, boolean b) {
             if(b) {
-                view.setBackground(currentActivity.getResources().getDrawable(R.drawable.shape_user_focus));
-                ((View)view.getParent()).animate().scaleX(1.05f).scaleY(1.05f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                
+                ((View)view.getParent()).animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
             } else {
                 view.setBackgroundColor(Color.TRANSPARENT);
                 ((View)view.getParent()).animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
@@ -156,7 +156,7 @@ public class HomeCatAdapter extends BaseQuickAdapter<HomeCatBean, BaseViewHolder
                             .transform(new RoundTransformation(MD5.string2MD5(item.pic + "position=" + helper.getLayoutPosition()))
                                     .centerCorp(true)
                                     .override(AutoSizeUtils.mm2px(mContext,277), AutoSizeUtils.mm2px(mContext,400))
-                                    .roundRadius(AutoSizeUtils.mm2px(mContext, 10), RoundTransformation.RoundType.ALL))
+                                    .roundRadius(AutoSizeUtils.mm2px(mContext, 5), RoundTransformation.RoundType.ALL))
                             .placeholder(R.drawable.img_loading_placeholder)
                             .error(R.drawable.img_loading_placeholder)
                             .into(ivThumb);
@@ -213,7 +213,7 @@ public class HomeCatAdapter extends BaseQuickAdapter<HomeCatBean, BaseViewHolder
                             .transform(new RoundTransformation(MD5.string2MD5(item.pic + "position=" + helper.getLayoutPosition()))
                                     .centerCorp(true)
                                     .override(AutoSizeUtils.mm2px(mContext,277), AutoSizeUtils.mm2px(mContext,400))
-                                    .roundRadius(AutoSizeUtils.mm2px(mContext, 10), RoundTransformation.RoundType.ALL))
+                                    .roundRadius(AutoSizeUtils.mm2px(mContext, 5), RoundTransformation.RoundType.ALL))
                             .placeholder(R.drawable.img_loading_placeholder)
                             .error(R.drawable.img_loading_placeholder)
                             .into(ivThumb);
