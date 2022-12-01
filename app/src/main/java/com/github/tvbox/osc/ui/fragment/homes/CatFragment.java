@@ -192,7 +192,7 @@ public class CatFragment extends AbstractHomeFragment {
                     textView.setTextColor(getResources().getColor(R.color.color_CCFFFFFF));
                     textView.invalidate();
                     view.findViewById(R.id.mSortLayout).setBackground(getResources().getDrawable(R.drawable.shape_txt_bg));
-                    view.findViewById(R.id.mSortLayout).setVerticalSpacing(getResources().10); 
+                    view.findViewById(R.id.mSortLayout).setVerticalSpacing(10); 
                     view.findViewById(R.id.tvFilter).setVisibility(View.GONE);
                 }
             }
@@ -203,7 +203,7 @@ public class CatFragment extends AbstractHomeFragment {
                     CatFragment.this.sortChange = true;
                     view.animate().scaleX(1.1f).scaleY(1.1f).setDuration(300).start();
                     view.findViewById(R.id.mSortLayout).setBackground(getResources().getDrawable(R.drawable.shape_txt_sltbg));
-                    view.findViewById(R.id.mSortLayout).setVerticalSpacing(getResources().12); 
+                    view.findViewById(R.id.mSortLayout).setVerticalSpacing(12); 
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(true);
                     textView.setTextColor(getResources().getColor(R.color.color_FFFFFF));
