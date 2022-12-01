@@ -191,7 +191,7 @@ public class CatFragment extends AbstractHomeFragment {
                     textView.getPaint().setFakeBoldText(false);
                     textView.setTextColor(getResources().getColor(R.color.color_CCFFFFFF));
                     textView.invalidate();
-                    view.findViewById(R.id.mSortLayout).setBackground(Color.TRANSPARENT);
+                    view.findViewById(R.id.mSortLayout).setBackgroundColor(Color.TRANSPARENT);
                     view.findViewById(R.id.tvFilter).setVisibility(View.GONE);
                 }
             }
