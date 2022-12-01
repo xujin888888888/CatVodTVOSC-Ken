@@ -141,6 +141,7 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
     @Override
     public void onClick(View v) {
         FastClickCheckUtil.check(v);
+        v.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
         if(v.getId() == R.id.tvVod && vodClickListener != null) {
             vodClickListener.onClick(v);
         } else if (v.getId() == R.id.tvLive) {

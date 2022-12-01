@@ -126,7 +126,8 @@ public class HistoryFragment extends BaseLazyFragment {
 
             @Override
             public void onItemClick(TvRecyclerView parent, View itemView, int position) {
-
+                
+                itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
             }
         });
         historyAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
