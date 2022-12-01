@@ -116,18 +116,19 @@ public class HistoryFragment extends BaseLazyFragment {
             public void onItemPreSelected(TvRecyclerView parent, View itemView, int position) {
                 itemView.findViewById(R.id.mItemFrame).setBackgroundColor(Color.TRANSPARENT);
                 itemView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                itemView.invalidate();
             }
 
             @Override
             public void onItemSelected(TvRecyclerView parent, View itemView, int position) {
                 
-                itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                itemView.animate().scaleX(1.1f).scaleY(1.1f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                itemView.invalidate();
             }
 
             @Override
             public void onItemClick(TvRecyclerView parent, View itemView, int position) {
                 
-                itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
             }
         });
         historyAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
