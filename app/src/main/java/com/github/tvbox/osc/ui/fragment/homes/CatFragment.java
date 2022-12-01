@@ -186,12 +186,12 @@ public class CatFragment extends AbstractHomeFragment {
         this.mCategoryGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
                 if (view != null && !isRight) {
-                    view.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).start();
+                    view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).start();
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(false);
                     textView.setTextColor(getResources().getColor(R.color.color_CCFFFFFF));
                     textView.invalidate();
-                    view.findViewById(R.id.mSortLayout).setBackground(getResources().getDrawable(R.drawable.shape_txt_bg));
+                    view.findViewById(R.id.mSortLayout).setBackground(Color.TRANSPARENT);
                     view.findViewById(R.id.tvFilter).setVisibility(View.GONE);
                 }
             }
@@ -200,6 +200,7 @@ public class CatFragment extends AbstractHomeFragment {
                 if (view != null) {
                     CatFragment.this.isRight = false;
                     CatFragment.this.sortChange = true;
+                    view.animate().scaleX(1.1f).scaleY(1.1f).setDuration(300).start();
                     view.findViewById(R.id.mSortLayout).setBackground(getResources().getDrawable(R.drawable.shape_txt_bg));
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(true);
