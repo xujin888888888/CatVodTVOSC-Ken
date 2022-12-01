@@ -205,6 +205,7 @@ public class DetailActivity extends BaseActivity {
             }
         };
         mSeriesGroupView.setAdapter(seriesGroupAdapter);
+        llPlayerFragmentContainerBlock.setOnClickListener((view -> toggleFullPreview()));
         tvSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -969,7 +970,7 @@ public class DetailActivity extends BaseActivity {
             if (originalFullScreen) {
                 controller.enableController(true);
             } else {
-                controller.stopFullScreen();
+                controller.stopshape_pic_focusScreen();
             }
         }
         VideoView videoView = playerFragment.getVideoView();
