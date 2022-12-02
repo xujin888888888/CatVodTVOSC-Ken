@@ -181,7 +181,7 @@ public class CatFragment extends AbstractHomeFragment {
 
     private void initCategorySection() {
         this.mCategoryGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, V7LinearLayoutManager.VERTICAL, false));
-        this.mCategoryGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(this.mContext, 2.0f));
+        
         this.mCategoryGridView.setAdapter(this.sortAdapter);
         this.mCategoryGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
@@ -191,7 +191,6 @@ public class CatFragment extends AbstractHomeFragment {
                     textView.getPaint().setFakeBoldText(false);
                     textView.setTextColor(getResources().getColor(R.color.color_CCFFFFFF));
                     textView.invalidate();
-                    view.findViewById(R.id.mSortLayout).setBackgroundColor(Color.TRANSPARENT);
                     view.findViewById(R.id.tvFilter).setVisibility(View.GONE);
                 }
             }
@@ -200,7 +199,6 @@ public class CatFragment extends AbstractHomeFragment {
                 if (view != null) {
                     CatFragment.this.isRight = false;
                     CatFragment.this.sortChange = true;
-                    view.findViewById(R.id.mSortLayout).setBackgroundColor(Color.argb(68, 0, 0, 0));
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(true);
                     textView.setTextColor(getResources().getColor(R.color.color_FFFFFF));
