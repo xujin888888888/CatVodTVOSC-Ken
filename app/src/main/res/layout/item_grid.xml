@@ -6,13 +6,12 @@
     android:layout_height="wrap_content"
     android:background="@drawable/shape_pic_focus"
     android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:padding="@dimen/vs_3">
+    android:padding="@dimen/vs_4">
 
     <FrameLayout
         android:id="@+id/mItemInnerFrame"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/vs_240"
+        android:layout_height="@dimen/vs_250"
         android:clipChildren="true">
 
         <ImageView
