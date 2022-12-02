@@ -4,7 +4,7 @@
     android:id="@+id/mItemFrame"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/shape_user_focus"
+    android:background="@drawable/shape_pic_focus"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:padding="@dimen/vs_1">

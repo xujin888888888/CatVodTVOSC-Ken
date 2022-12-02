@@ -5,7 +5,8 @@
         android:gravity="center|center_horizontal|center_vertical"      
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/vs_10">
 
   <LinearLayout
         android:layout_gravity="center"
