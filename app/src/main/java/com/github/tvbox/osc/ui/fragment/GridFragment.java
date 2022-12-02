@@ -148,7 +148,6 @@ public class GridFragment extends BaseLazyFragment {
         mGridView.setHasFixedSize(true);
         mGridView.setAdapter(adapter);
         mGridView.setLayoutManager(new V7GridLayoutManager(this.mContext, this.spanCount));
-        mGridView.setSpacingWithMargins(3, AutoSizeUtils.dp2px(this.mContext, 2.0f));
         adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
@@ -167,14 +166,14 @@ public class GridFragment extends BaseLazyFragment {
 
             @Override
             public void onItemSelected(TvRecyclerView parent, View itemView, int position) {
-                if(itemListener != null)
+             itemView.findViewById(R.id.tvName).setSelected(true);
+                itemView.animate().scaleX(1.06f).scaleY(1.06f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                   if(itemListener != null)
                     itemListener.onItemSelected(parent, itemView, position);
             }
 
             @Override
             public void onItemClick(TvRecyclerView parent, View itemView, int position) {
-                itemView.findViewById(R.id.tvName).setSelected(true);
-                itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
                 if(itemListener != null)
                     itemListener.onItemClick(parent, itemView, position);
             }
