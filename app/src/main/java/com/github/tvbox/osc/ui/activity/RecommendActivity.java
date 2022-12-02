@@ -71,7 +71,7 @@ public class RecommendActivity extends BaseActivity {
         this.recomViewPager = findViewById(R.id.recomViewPager);
         this.sortAdapter = new SortAdapter();
         this.recomGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, V7LinearLayoutManager.VERTICAL, false));
-        this.recomGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(this.mContext, 2.0f));
+        this.recomGridView.setSpacingWithMargins(3, AutoSizeUtils.dp2px(this.mContext, 2.0f));
         this.recomGridView.setAdapter(this.sortAdapter);
         this.recomGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
