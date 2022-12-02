@@ -198,7 +198,7 @@ public class CatFragment extends AbstractHomeFragment {
                 if (view != null) {
                     CatFragment.this.isRight = false;
                     CatFragment.this.sortChange = true;
-                    view.animate().scaleX(1.06f).scaleY(1.06f).setDuration(300).start();
+                    view.animate().scaleX(1.07f).scaleY(1.07f).setDuration(300).start();
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(true);
                     textView.setTextColor(getResources().getColor(R.color.color_FFFFFF));
