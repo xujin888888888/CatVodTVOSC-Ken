@@ -76,7 +76,7 @@ public class GridAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHolder> {
                             .load(DefaultConfig.checkReplaceProxy(item.pic))
                             .transform(new RoundTransformation(MD5.string2MD5(item.pic + "position=" + helper.getLayoutPosition()))
                                     .centerCorp(true)
-                                    .override(AutoSizeUtils.mm2px(mContext,277), AutoSizeUtils.mm2px(mContext,400))
+                                    .override(AutoSizeUtils.mm2px(mContext,275), AutoSizeUtils.mm2px(mContext,395))
                                     .roundRadius(AutoSizeUtils.mm2px(mContext, 5), RoundTransformation.RoundType.ALL))
                             .placeholder(R.drawable.img_loading_placeholder)
                             .error(R.drawable.img_loading_placeholder)

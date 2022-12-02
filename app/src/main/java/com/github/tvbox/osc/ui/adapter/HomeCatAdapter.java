@@ -113,9 +113,9 @@ public class HomeCatAdapter extends BaseQuickAdapter<HomeCatBean, BaseViewHolder
         public void onFocusChange(View view, boolean b) {
             if(b) {
                 
-                ((View)view.getParent()).animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                ((View)view.getParent()).animate().scaleX(1.07f).scaleY(1.07f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
             } else {
-                view.setBackgroundColor(Color.TRANSPARENT);
+       
                 ((View)view.getParent()).animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
             }
         }
@@ -155,7 +155,7 @@ public class HomeCatAdapter extends BaseQuickAdapter<HomeCatBean, BaseViewHolder
                             .load(DefaultConfig.checkReplaceProxy(item.pic))
                             .transform(new RoundTransformation(MD5.string2MD5(item.pic + "position=" + helper.getLayoutPosition()))
                                     .centerCorp(true)
-                                    .override(AutoSizeUtils.mm2px(mContext,277), AutoSizeUtils.mm2px(mContext,400))
+                                    .override(AutoSizeUtils.mm2px(mContext,275), AutoSizeUtils.mm2px(mContext,395))
                                     .roundRadius(AutoSizeUtils.mm2px(mContext, 5), RoundTransformation.RoundType.ALL))
                             .placeholder(R.drawable.img_loading_placeholder)
                             .error(R.drawable.img_loading_placeholder)
@@ -212,7 +212,7 @@ public class HomeCatAdapter extends BaseQuickAdapter<HomeCatBean, BaseViewHolder
                             .load(DefaultConfig.checkReplaceProxy(item.pic))
                             .transform(new RoundTransformation(MD5.string2MD5(item.pic + "position=" + helper.getLayoutPosition()))
                                     .centerCorp(true)
-                                    .override(AutoSizeUtils.mm2px(mContext,277), AutoSizeUtils.mm2px(mContext,400))
+                                    .override(AutoSizeUtils.mm2px(mContext,275), AutoSizeUtils.mm2px(mContext,395))
                                     .roundRadius(AutoSizeUtils.mm2px(mContext, 5), RoundTransformation.RoundType.ALL))
                             .placeholder(R.drawable.img_loading_placeholder)
                             .error(R.drawable.img_loading_placeholder)
