@@ -28,6 +28,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.jessyan.autosize.utils.AutoSizeUtils;
+
 public class HistoryFragment extends BaseLazyFragment {
 
     private LinearLayout tvDelTipLayout;
@@ -107,6 +109,7 @@ public class HistoryFragment extends BaseLazyFragment {
         mGridView = findViewById(R.id.mGridView);
         mGridView.setHasFixedSize(true);
         V7GridLayoutManager layoutManager = new V7GridLayoutManager(this.mContext, !shouldMoreColumns() ? 5 : 6);
+        mGridView.setSpacingWithMargins(3, AutoSizeUtils.dp2px(this.mContext, 2.0f));
         mGridView.setLayoutManager(layoutManager);
         historyAdapter = new HistoryAdapter();
         mGridView.setAdapter(historyAdapter);

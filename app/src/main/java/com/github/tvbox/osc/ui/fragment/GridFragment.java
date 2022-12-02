@@ -27,6 +27,8 @@ import com.owen.tvrecyclerview.widget.V7GridLayoutManager;
 
 import org.apache.commons.lang3.StringUtils;
 
+import me.jessyan.autosize.utils.AutoSizeUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -146,6 +148,7 @@ public class GridFragment extends BaseLazyFragment {
         mGridView.setHasFixedSize(true);
         mGridView.setAdapter(adapter);
         mGridView.setLayoutManager(new V7GridLayoutManager(this.mContext, this.spanCount));
+        mGridView..setSpacingWithMargins(3, AutoSizeUtils.dp2px(this.mContext, 2.0f));
         adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
@@ -158,16 +161,12 @@ public class GridFragment extends BaseLazyFragment {
             public void onItemPreSelected(TvRecyclerView parent, View itemView, int position) {
                 itemView.findViewById(R.id.tvName).setSelected(false);
                 itemView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
-                itemView.invalidate();
                 if(itemListener != null)
                     itemListener.onItemPreSelected(parent, itemView, position);
             }
 
             @Override
             public void onItemSelected(TvRecyclerView parent, View itemView, int position) {
-                itemView.findViewById(R.id.tvName).setSelected(true);
-                itemView.animate().scaleX(1.1f).scaleY(1.1f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
-                itemView.invalidate();
                 if(itemListener != null)
                     itemListener.onItemSelected(parent, itemView, position);
             }
