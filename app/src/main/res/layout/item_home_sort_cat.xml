@@ -4,12 +4,22 @@
     android:id="@+id/mSortLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/button_home_sort_focus"
     android:clickable="true"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:gravity="center|center_horizontal|center_vertical"
     android:orientation="horizontal"
     android:padding="@dimen/vs_10">
+
+  <ImageView
+        android:id="@+id/mSortLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/vs_6"
+        android:layout_weight="1"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/shape_focus_bar" />
 
     <TextView
         android:id="@+id/tvTitle"
