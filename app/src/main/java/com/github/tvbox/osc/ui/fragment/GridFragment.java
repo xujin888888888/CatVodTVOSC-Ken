@@ -148,7 +148,7 @@ public class GridFragment extends BaseLazyFragment {
         mGridView.setHasFixedSize(true);
         mGridView.setAdapter(adapter);
         mGridView.setLayoutManager(new V7GridLayoutManager(this.mContext, this.spanCount));
-        mGridView..setSpacingWithMargins(3, AutoSizeUtils.dp2px(this.mContext, 2.0f));
+        mGridView.setSpacingWithMargins(3, AutoSizeUtils.dp2px(this.mContext, 2.0f));
         adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
