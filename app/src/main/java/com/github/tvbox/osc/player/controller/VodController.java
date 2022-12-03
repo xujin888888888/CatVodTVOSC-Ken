@@ -229,7 +229,6 @@ public class VodController extends BaseController {
                     textView.setTextColor(getResources().getColor(R.color.color_6C3D3D3D));
                     textView.invalidate();
                 }
-            } 
             
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
