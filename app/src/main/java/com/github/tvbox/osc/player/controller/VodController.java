@@ -210,7 +210,27 @@ public class VodController extends BaseController {
         mGridView.setLayoutManager(new V7LinearLayoutManager(getContext(), 0, false));
 
         parseAdapter = new ParseAdapter();
+        
         parseAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            public void onItemPreSelected(BaseQuickAdapter adapte, View view, int position) {
+                    view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).start();
+                    TextView textView = view.findViewById(R.id.tvParse);
+                    textView.getPaint().setFakeBoldText(false);
+                    textView.setTextColor(getResources().getColor(R.color.color_FFFFFF));
+                    textView.invalidate();
+                    view.findViewById(R.id.tvFilter).setVisibility(View.GONE);
+                }
+
+            public void onItemSelected(BaseQuickAdapter adapte, View view, int position) {
+                if (view != null)
+                    view.animate().scaleX(1.07f).scaleY(1.07f).setDuration(300).start();
+                    TextView textView = view.findViewById(R.id.tvParse);
+                    textView.getPaint().setFakeBoldText(true);
+                    textView.setTextColor(getResources().getColor(R.color.color_6C3D3D3D));
+                    textView.invalidate();
+                }
+            } 
+            
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 ParseBean parseBean = parseAdapter.getItem(position);
