@@ -97,7 +97,7 @@ public class AssembledFragment extends AbstractHomeFragment {
             this.mViewPager = findViewById(R.id.mViewPager);
             this.sortAdapter = new SortAdapter();
             this.mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, V7LinearLayoutManager.VERTICAL, false));
-            this.mGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(this.mContext, 2.0f));
+            this.mGridView.setSpacingWithMargins(30, AutoSizeUtils.dp2px(this.mContext, 2.0f));
             this.mGridView.setAdapter(this.sortAdapter);
             this.mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
                 public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
