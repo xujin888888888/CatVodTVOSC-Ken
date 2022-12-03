@@ -7,8 +7,7 @@
     android:background="@drawable/button_home_sort_focus"
     android:clickable="true"
     android:focusable="true"
-    android:layout_marginLeft="@dimen/vs_10"
-    android:layout_marginTop="@dimen/vs_10"
+    android:layout_margin="@dimen/vs_10"
     android:focusableInTouchMode="true"
     android:gravity="center|center_horizontal|center_vertical"
     android:orientation="horizontal" >
