@@ -86,7 +86,7 @@ public class HistoryActivity extends BaseActivity {
 
             @Override
             public void onItemSelected(TvRecyclerView parent, View itemView, int position) {
-                itemView.animate().scaleX(1.05f).scaleY(1.05f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                itemView.animate().scaleX(1.08f).scaleY(1.08f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
             }
 
             @Override

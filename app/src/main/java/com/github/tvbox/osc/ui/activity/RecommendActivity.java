@@ -71,7 +71,7 @@ public class RecommendActivity extends BaseActivity {
         this.recomViewPager = findViewById(R.id.recomViewPager);
         this.sortAdapter = new SortAdapter();
         this.recomGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, V7LinearLayoutManager.VERTICAL, false));
-        this.recomGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(this.mContext, 2.0f));
+        this.recomGridView.setSpacingWithMargins(30, AutoSizeUtils.dp2px(this.mContext, 1.5f));
         this.recomGridView.setAdapter(this.sortAdapter);
         this.recomGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
@@ -93,7 +93,7 @@ public class RecommendActivity extends BaseActivity {
                     }
                     isRight = false;
                     sortChange = true;
-                    view.animate().scaleX(1.06f).scaleY(1.06f).setInterpolator(new BounceInterpolator()).setDuration(300).start();
+                    view.animate().scaleX(1.1f).scaleY(1.1f).setInterpolator(new BounceInterpolator()).setDuration(300).start();
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(true);
                     textView.setTextColor(getResources().getColor(R.color.color_FFFFFF));
