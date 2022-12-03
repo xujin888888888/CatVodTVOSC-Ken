@@ -4,6 +4,7 @@
         <shape>
             <corners android:radius="20mm"/>
             <solid android:color="@color/color_BD0CADE2"/>
+            <stroke android:width="@dimen/vs_2" android:color="@android:color/white" />
         </shape>
     </item>
     <item android:state_focused="false">

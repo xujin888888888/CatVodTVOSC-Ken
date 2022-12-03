@@ -3,7 +3,7 @@
     <item android:state_focused="true" android:state_pressed="true">
         <shape>
             <corners android:radius="5mm" />
-            <solid android:color="@color/color_80FF0057" />
+            <solid android:color="color/white" />
             <stroke android:width="@dimen/vs_2" android:color="@android:color/white" />
         </shape>
         
@@ -11,14 +11,14 @@
     <item android:state_focused="false" android:state_pressed="true">
         <shape>
             <corners android:radius="5mm" />
-            <solid android:color="@color/color_80FF0057"/>
+            <solid android:color="@color/white"/>
             <stroke android:width="@dimen/vs_2" android:color="@android:color/white" />
         </shape>
     </item>
     <item android:state_focused="true">
         <shape>
             <corners android:radius="5mm" />
-            <solid android:color="@color/color_80FF0057"/>
+            <solid android:color="color/white"/>
             <stroke android:width="@dimen/vs_2" android:color="@android:color/white" />
         </shape>
     </item>
