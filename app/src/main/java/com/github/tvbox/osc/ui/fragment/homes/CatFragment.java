@@ -181,7 +181,7 @@ public class CatFragment extends AbstractHomeFragment {
 
     private void initCategorySection() {
         this.mCategoryGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, V7LinearLayoutManager.VERTICAL, false));
-        this.mCategoryGridView.setSpacingWithMargins(30, AutoSizeUtils.dp2px(this.mContext, 2.0f));
+        this.mCategoryGridView.setSpacingWithMargins(30, AutoSizeUtils.dp2px(this.mContext, 1.5f));
         this.mCategoryGridView.setAdapter(this.sortAdapter);
         this.mCategoryGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
