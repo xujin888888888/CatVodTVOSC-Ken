@@ -114,7 +114,7 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
             if (hasFocus)
-                v.animate().scaleX(1.1f).scaleY(1.1f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                v.animate().scaleX(1.08f).scaleY(1.08f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
             else
                 v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
             anyItemFocused = hasFocus;
@@ -160,7 +160,6 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         } else if(v.getId() == R.id.tvQrCode) {
             QRCodeDialog dialog = new QRCodeDialog(mContext);
             dialog.show();
-            
         }
     }
 
