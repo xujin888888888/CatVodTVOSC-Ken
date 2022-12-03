@@ -34,7 +34,7 @@
 
             <com.owen.tvrecyclerview.widget.TvRecyclerView
                 android:id="@+id/mCategoryGridView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/vs_3"
                 android:layout_marginTop="@dimen/vs_10"
