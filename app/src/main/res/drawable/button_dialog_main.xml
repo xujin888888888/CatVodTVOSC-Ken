@@ -16,6 +16,7 @@
         <shape>
             <corners android:radius="@dimen/vs_5" />
             <solid android:color="@color/color_B36C0025" />
+            <stroke android:width="@dimen/vs_2" android:color="@android:color/white" />
         </shape>
     </item>
     <item android:state_focused="false" android:state_pressed="false">
