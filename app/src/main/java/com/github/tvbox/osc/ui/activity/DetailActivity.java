@@ -96,6 +96,8 @@ import xyz.doikki.videoplayer.player.VideoView;
  */
 public class DetailActivity extends BaseActivity {
     private LinearLayout llLayout;
+    private FragmentContainerView llPlayerFragmentContainer;
+    private View llPlayerFragmentContainerBlock;
     private ImageView ivThumb;
     private TextView tvName;
     private TextView tvYear;
@@ -163,6 +165,8 @@ public class DetailActivity extends BaseActivity {
 
     private void initView() {
         llLayout = findViewById(R.id.llLayout);
+        llPlayerFragmentContainer = findViewById(R.id.previewPlayer);
+        llPlayerFragmentContainerBlock = findViewById(R.id.previewPlayerBlock);
         ivThumb = findViewById(R.id.ivThumb);
         tvName = findViewById(R.id.tvName);
         tvYear = findViewById(R.id.tvYear);
@@ -205,6 +209,7 @@ public class DetailActivity extends BaseActivity {
             }
         };
         mSeriesGroupView.setAdapter(seriesGroupAdapter);
+        llPlayerFragmentContainerBlock.setOnClickListener((view -> toggleFullPreview()));
         tvSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -298,6 +303,11 @@ public class DetailActivity extends BaseActivity {
             }
         });
         mGridViewFlag.setOnItemListener(new TvRecyclerView.OnItemListener() {
+        
+        private void onGridViewFocusChange(View view, boolean hasFocus) {
+        if (llPlayerFragmentContainerBlock.getVisibility() != View.VISIBLE) return;
+        llPlayerFragmentContainerBlock.setFocusable(!hasFocus);
+    }
             private void refresh(View itemView, int position) {
                 String newFlag = seriesFlagAdapter.getData().get(position).name;
                 if (vodInfo != null && !vodInfo.playFlag.equals(newFlag)) {
@@ -696,6 +706,9 @@ public class DetailActivity extends BaseActivity {
 
                         refreshList();
                         jumpToPlay(false, true, null);
+                        llPlayerFragmentContainer.setVisibility(View.VISIBLE);
+                        llPlayerFragmentContainerBlock.setVisibility(View.VISIBLE);
+                        llPlayerFragmentContainerBlock.requestFocus();
                         JsonObject updateNotice = new JsonObject();
                         updateNotice.addProperty("type", "detail");
                         updateNotice.addProperty("state", "activated");
@@ -710,6 +723,8 @@ public class DetailActivity extends BaseActivity {
                     }
                 } else {
                     showEmpty();
+                    llPlayerFragmentContainer.setVisibility(View.GONE);
+                    llPlayerFragmentContainerBlock.setVisibility(View.GONE);
                 }
             }
         });
@@ -1082,4 +1097,26 @@ public class DetailActivity extends BaseActivity {
         startActivity(intent);
         super.onBackPressed();
     }
+    void toggleFullPreview() {
+        if (windowsPreview == null) {
+            windowsPreview = llPlayerFragmentContainer.getLayoutParams();
+        }
+        if (windowsFull == null) {
+            windowsFull = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        }
+        fullWindows = !fullWindows;
+        llPlayerFragmentContainer.setLayoutParams(fullWindows ? windowsFull : windowsPreview);
+        llPlayerFragmentContainerBlock.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+        mGridView.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+        mGridViewFlag.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+        mSeriesGroupView.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+
+        //全屏下禁用详情页几个按键的焦点 防止上键跑过来
+        tvPlay.setFocusable(!fullWindows);
+        tvSort.setFocusable(!fullWindows);
+        tvCollect.setFocusable(!fullWindows);
+        tvQuickSearch.setFocusable(!fullWindows);
+        toggleSubtitleTextSize();
+    }
+    
 }
