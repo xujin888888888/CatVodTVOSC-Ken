@@ -100,6 +100,8 @@ public class DetailActivity extends BaseActivity {
     private LinearLayout llLayout;
     private FragmentContainerView llPlayerFragmentContainer;
     private View llPlayerFragmentContainerBlock;
+    private View llPlayerPlace;
+    private PlayerFragment playerFragment = null;
     private ImageView ivThumb;
     private TextView tvName;
     private TextView tvYear;
@@ -133,7 +135,6 @@ public class DetailActivity extends BaseActivity {
     boolean seriesSelect = false;
     private View seriesFlagFocus = null;
     private int lastSeriesFocusIndex = -1;
-    private FrameLayout mPlayerFrame;
     private static PlayerFragment playerFragment;
     private ArrayList<String> seriesGroupOptions = new ArrayList<>();
     private SelectDialog<Integer> thirdPlayerDialog;
@@ -170,6 +171,8 @@ public class DetailActivity extends BaseActivity {
         llPlayerFragmentContainer = findViewById(R.id.previewPlayer);
         llPlayerFragmentContainerBlock = findViewById(R.id.previewPlayerBlock);
         ivThumb = findViewById(R.id.ivThumb);
+        llPlayerPlace.setVisibility(showPreview ? View.VISIBLE : View.GONE);
+        ivThumb.setVisibility(!showPreview ? View.VISIBLE : View.GONE);
         tvName = findViewById(R.id.tvName);
         tvYear = findViewById(R.id.tvYear);
         tvSite = findViewById(R.id.tvSite);
@@ -188,7 +191,6 @@ public class DetailActivity extends BaseActivity {
         seriesGroupLayout = findViewById(R.id.seriesGroupLayout);
         tv3rdPlay = findViewById(R.id.tv3rdPlay);
         tv3rdPlayName = findViewById(R.id.tv3rdPlayName);
-        playerFragment = new PlayerFragment();
         mGridView = findViewById(R.id.mGridView);
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, LinearLayoutManager.HORIZONTAL, false));
@@ -199,7 +201,12 @@ public class DetailActivity extends BaseActivity {
         mGridViewFlag.setLayoutManager(new V7LinearLayoutManager(this.mContext, LinearLayoutManager.HORIZONTAL, false));
         seriesFlagAdapter = new SeriesFlagAdapter();
         mGridViewFlag.setAdapter(seriesFlagAdapter);
-        mPlayerFrame = findViewById(R.id.mPlayerFrame);
+                if (showPreview) {
+            playerFragment = new PlayerFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.previewPlayer, playerFragment).commit();
+            getSupportFragmentManager().beginTransaction().show(playerFragment).commitAllowingStateLoss();
+            tvPlay.setText("全屏");
+        }
         mSeriesGroupView = findViewById(R.id.mSeriesGroupView);
         mSeriesGroupView.setHasFixedSize(true);
         mSeriesGroupView.setLayoutManager(new V7LinearLayoutManager(this.mContext, LinearLayoutManager.HORIZONTAL, false));
@@ -453,7 +460,7 @@ public class DetailActivity extends BaseActivity {
                 currentSeriesGroupView = view;
             }
         });
-        mPlayerFrame.post(new Runnable() {
+        playerFragment.post(new Runnable() {
             @Override
             public void run() {
                 playerFragment.getVodController().enableController(false);
@@ -544,7 +551,7 @@ public class DetailActivity extends BaseActivity {
     private void insertPlayerFragment() {
         FrameLayout tempFrame = new FrameLayout(this);
         tempFrame.setId(DETAIL_PLAYER_FRAME_ID);
-        mPlayerFrame.addView(tempFrame, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        playerFragment.addView(tempFrame, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(DETAIL_PLAYER_FRAME_ID, playerFragment, PlayerFragment.FRAGMENT_TAG)
@@ -969,7 +976,7 @@ public class DetailActivity extends BaseActivity {
         super.onResume();
         init3rdPlayerButton();
         if(getSupportFragmentManager().findFragmentByTag(PlayerFragment.FRAGMENT_TAG) == null) {
-            mPlayerFrame.removeAllViews();
+            playerFragment.removeAllViews();
             insertPlayerFragment();
         }
         VodController controller = playerFragment.getVodController();
