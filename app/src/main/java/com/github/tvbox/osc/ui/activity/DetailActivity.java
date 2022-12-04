@@ -451,10 +451,7 @@ public class DetailActivity extends BaseActivity {
             }
         });
         
-        private void onGridViewFocusChange(View view, boolean hasFocus) {
-        if (mPlayerFrameBlock.getVisibility() != View.VISIBLE) return;
-        mPlayerFrameBlock.setFocusable(!hasFocus);
-    }
+        
         mPlayerFrame.post(new Runnable() {
             @Override
             public void run() {
@@ -485,6 +482,11 @@ public class DetailActivity extends BaseActivity {
         });
         init3rdPlayerButton();
         setLoadSir(llLayout);
+    }
+    
+    private void onGridViewFocusChange(View view, boolean hasFocus) {
+        if (mPlayerFrameBlock.getVisibility() != View.VISIBLE) return;
+        mPlayerFrameBlock.setFocusable(!hasFocus);
     }
 
     private interface ThirdPlayerSelectDialogCallback {
