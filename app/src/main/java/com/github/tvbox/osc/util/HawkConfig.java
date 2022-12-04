@@ -35,6 +35,7 @@ public class HawkConfig {
     public static final String CUSTOM_WALLPAPER = "custom_wallpaper";
     public static final String SOURCES_FOR_SEARCH = "checked_sources_for_search";
     public static final String STORAGE_DRIVE_SORT = "storage_drive_sort";
+    public static final String SHOW_PREVIEW = "show_preview";
     public static final String TV_TYPE = "tv_type";
     public static final String REMOTE_CONTROL = "remote_control";
 }
