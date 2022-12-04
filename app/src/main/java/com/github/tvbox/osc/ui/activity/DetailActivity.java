@@ -18,6 +18,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -1098,6 +1099,14 @@ public class DetailActivity extends BaseActivity {
         startActivity(intent);
         super.onBackPressed();
     }
+    
+      // preview
+    VodInfo previewVodInfo = null;
+    boolean showPreview = Hawk.get(HawkConfig.SHOW_PREVIEW, true);; // true 开启 false 关闭
+    boolean fullWindows = false;
+    ViewGroup.LayoutParams windowsPreview = null;
+    ViewGroup.LayoutParams windowsFull = null;
+
     void toggleFullPreview() {
         if (windowsPreview == null) {
             windowsPreview = llPlayerFragmentContainer.getLayoutParams();
@@ -1117,7 +1126,6 @@ public class DetailActivity extends BaseActivity {
         tvSort.setFocusable(!fullWindows);
         tvCollect.setFocusable(!fullWindows);
         tvQuickSearch.setFocusable(!fullWindows);
-        toggleSubtitleTextSize();
     }
     
 }
