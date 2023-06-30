@@ -47,6 +47,7 @@ import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.MD5;
 import com.github.tvbox.osc.util.SearchHelper;
+import com.github.tvbox.osc.util.SubtitleHelper;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -672,7 +673,7 @@ public class DetailActivity extends BaseActivity {
                             jumpToPlay();
                             llPlayerFragmentContainer.setVisibility(View.VISIBLE);
                             llPlayerFragmentContainerBlock.setVisibility(View.VISIBLE);
-                           
+                            toggleSubtitleTextSize();
                         }
                         // startQuickSearch();
                     } else {
@@ -955,8 +956,14 @@ public class DetailActivity extends BaseActivity {
         tvSort.setFocusable(!fullWindows);
         tvCollect.setFocusable(!fullWindows);
         tvQuickSearch.setFocusable(!fullWindows);
-        
+        toggleSubtitleTextSize();
     }
 
-    
+    void toggleSubtitleTextSize() {
+        int subtitleTextSize  = SubtitleHelper.getTextSize(this);
+        if (!fullWindows) {
+            subtitleTextSize *= 0.6;
+        }
+        EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_SUBTITLE_SIZE_CHANGE, subtitleTextSize));
+    }
 }
