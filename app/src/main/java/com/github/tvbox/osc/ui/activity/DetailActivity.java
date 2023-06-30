@@ -96,6 +96,9 @@ import xyz.doikki.videoplayer.player.VideoView;
  */
 public class DetailActivity extends BaseActivity {
     private LinearLayout llLayout;
+    private FragmentContainerView mPlayerFrame;
+    private View mPlayerFrameBlock;
+    private View llPlayerPlace;
     private ImageView ivThumb;
     private TextView tvName;
     private TextView tvYear;
@@ -163,7 +166,12 @@ public class DetailActivity extends BaseActivity {
 
     private void initView() {
         llLayout = findViewById(R.id.llLayout);
+        llPlayerPlace = findViewById(R.id.previewPlayerPlace);
+        mPlayerFrame = findViewById(R.id.mPlayerFrame);
+        mPlayerFrameBlock = findViewById(R.id.previewPlayerBlock);
         ivThumb = findViewById(R.id.ivThumb);
+        llPlayerPlace.setVisibility(showPreview ? View.VISIBLE : View.GONE);
+        ivThumb.setVisibility(!showPreview ? View.VISIBLE : View.GONE);
         tvName = findViewById(R.id.tvName);
         tvYear = findViewById(R.id.tvYear);
         tvSite = findViewById(R.id.tvSite);
@@ -205,6 +213,7 @@ public class DetailActivity extends BaseActivity {
             }
         };
         mSeriesGroupView.setAdapter(seriesGroupAdapter);
+        mPlayerFrameBlock.setOnClickListener((view -> toggleFullPreview()));
         tvSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -441,6 +450,11 @@ public class DetailActivity extends BaseActivity {
                 currentSeriesGroupView = view;
             }
         });
+        
+        private void onGridViewFocusChange(View view, boolean hasFocus) {
+        if (mPlayerFrameBlock.getVisibility() != View.VISIBLE) return;
+        mPlayerFrameBlock.setFocusable(!hasFocus);
+    }
         mPlayerFrame.post(new Runnable() {
             @Override
             public void run() {
@@ -696,6 +710,8 @@ public class DetailActivity extends BaseActivity {
 
                         refreshList();
                         jumpToPlay(false, true, null);
+                        mPlayerFrame.setVisibility(View.VISIBLE);
+                        mPlayerFrameBlock.setVisibility(View.VISIBLE);
                         JsonObject updateNotice = new JsonObject();
                         updateNotice.addProperty("type", "detail");
                         updateNotice.addProperty("state", "activated");
@@ -710,6 +726,8 @@ public class DetailActivity extends BaseActivity {
                     }
                 } else {
                     showEmpty();
+                    mPlayerFrame.setVisibility(View.GONE);
+                    mPlayerFrameBlock.setVisibility(View.GONE);
                 }
             }
         });
@@ -1082,4 +1100,33 @@ public class DetailActivity extends BaseActivity {
         startActivity(intent);
         super.onBackPressed();
     }
+        // preview
+    VodInfo previewVodInfo = null;
+    boolean showPreview = Hawk.get(HawkConfig.SHOW_PREVIEW, true);; // true 开启 false 关闭
+    boolean fullWindows = false;
+    ViewGroup.LayoutParams windowsPreview = null;
+    ViewGroup.LayoutParams windowsFull = null;
+
+    void toggleFullPreview() {
+        if (windowsPreview == null) {
+            windowsPreview = mPlayerFrame.getLayoutParams();
+        }
+        if (windowsFull == null) {
+            windowsFull = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        }
+        fullWindows = !fullWindows;
+        mPlayerFrame.setLayoutParams(fullWindows ? windowsFull : windowsPreview);
+        mPlayerFrameBlock.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+        mGridView.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+        mGridViewFlag.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+        mSeriesGroupView.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+
+        //全屏下禁用详情页几个按键的焦点 防止上键跑过来
+        tvPlay.setFocusable(!fullWindows);
+        tvSort.setFocusable(!fullWindows);
+        tvCollect.setFocusable(!fullWindows);
+        tvQuickSearch.setFocusable(!fullWindows);
+        
+    }
+
 }
