@@ -57,7 +57,7 @@ public class RemoteServer extends NanoHTTPD {
     private DataReceiver mDataReceiver;
     private ArrayList<RequestProcess> getRequestList = new ArrayList<>();
     private ArrayList<RequestProcess> postRequestList = new ArrayList<>();
-    public static String m3u8Content;
+
     public RemoteServer(int port, Context context) {
         super(port);
         mContext = context;
@@ -159,8 +159,6 @@ public class RemoteServer extends NanoHTTPD {
                         rs = new byte[0];
                     }
                     return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/dns-message", new ByteArrayInputStream(rs), rs.length);
-                 } else if (fileName.equals("/m3u8")) {
-                    return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,  NanoHTTPD.MIME_PLAINTEXT, m3u8Content);
                 }
             } else if (session.getMethod() == Method.POST) {
                 Map<String, String> files = new HashMap<String, String>();
