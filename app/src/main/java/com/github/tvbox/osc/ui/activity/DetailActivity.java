@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import androidx.fragment.app.FragmentContainerView;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
 import android.os.Build;
@@ -18,7 +17,6 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -98,10 +96,9 @@ import xyz.doikki.videoplayer.player.VideoView;
  */
 public class DetailActivity extends BaseActivity {
     private LinearLayout llLayout;
-    private FragmentContainerView llPlayerFragmentContainer;
-    private View llPlayerFragmentContainerBlock;
+    private FragmentContainerView mPlayerFrame;
+    private View mPlayerFrameBlock;
     private View llPlayerPlace;
-    private PlayerFragment playerFragment = null;
     private ImageView ivThumb;
     private TextView tvName;
     private TextView tvYear;
@@ -135,6 +132,7 @@ public class DetailActivity extends BaseActivity {
     boolean seriesSelect = false;
     private View seriesFlagFocus = null;
     private int lastSeriesFocusIndex = -1;
+    private FrameLayout mPlayerFrame;
     private static PlayerFragment playerFragment;
     private ArrayList<String> seriesGroupOptions = new ArrayList<>();
     private SelectDialog<Integer> thirdPlayerDialog;
@@ -168,8 +166,9 @@ public class DetailActivity extends BaseActivity {
 
     private void initView() {
         llLayout = findViewById(R.id.llLayout);
-        llPlayerFragmentContainer = findViewById(R.id.previewPlayer);
-        llPlayerFragmentContainerBlock = findViewById(R.id.previewPlayerBlock);
+        llPlayerPlace = findViewById(R.id.previewPlayerPlace);
+        mPlayerFrame = findViewById(R.id.mPlayerFrame);
+        mPlayerFrameBlock = findViewById(R.id.previewPlayerBlock);
         ivThumb = findViewById(R.id.ivThumb);
         llPlayerPlace.setVisibility(showPreview ? View.VISIBLE : View.GONE);
         ivThumb.setVisibility(!showPreview ? View.VISIBLE : View.GONE);
@@ -191,6 +190,7 @@ public class DetailActivity extends BaseActivity {
         seriesGroupLayout = findViewById(R.id.seriesGroupLayout);
         tv3rdPlay = findViewById(R.id.tv3rdPlay);
         tv3rdPlayName = findViewById(R.id.tv3rdPlayName);
+        playerFragment = new PlayerFragment();
         mGridView = findViewById(R.id.mGridView);
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, LinearLayoutManager.HORIZONTAL, false));
@@ -201,12 +201,7 @@ public class DetailActivity extends BaseActivity {
         mGridViewFlag.setLayoutManager(new V7LinearLayoutManager(this.mContext, LinearLayoutManager.HORIZONTAL, false));
         seriesFlagAdapter = new SeriesFlagAdapter();
         mGridViewFlag.setAdapter(seriesFlagAdapter);
-                if (showPreview) {
-            playerFragment = new PlayerFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.previewPlayer, playerFragment).commit();
-            getSupportFragmentManager().beginTransaction().show(playerFragment).commitAllowingStateLoss();
-            tvPlay.setText("全屏");
-        }
+        mPlayerFrame = findViewById(R.id.mPlayerFrame);
         mSeriesGroupView = findViewById(R.id.mSeriesGroupView);
         mSeriesGroupView.setHasFixedSize(true);
         mSeriesGroupView.setLayoutManager(new V7LinearLayoutManager(this.mContext, LinearLayoutManager.HORIZONTAL, false));
@@ -218,7 +213,7 @@ public class DetailActivity extends BaseActivity {
             }
         };
         mSeriesGroupView.setAdapter(seriesGroupAdapter);
-        llPlayerFragmentContainerBlock.setOnClickListener((view -> toggleFullPreview()));
+        mPlayerFrameBlock.setOnClickListener((view -> toggleFullPreview()));
         tvSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -312,11 +307,6 @@ public class DetailActivity extends BaseActivity {
             }
         });
         mGridViewFlag.setOnItemListener(new TvRecyclerView.OnItemListener() {
-        
-        private void onGridViewFocusChange(View view, boolean hasFocus) {
-        if (llPlayerFragmentContainerBlock.getVisibility() != View.VISIBLE) return;
-        llPlayerFragmentContainerBlock.setFocusable(!hasFocus);
-    }
             private void refresh(View itemView, int position) {
                 String newFlag = seriesFlagAdapter.getData().get(position).name;
                 if (vodInfo != null && !vodInfo.playFlag.equals(newFlag)) {
@@ -460,7 +450,12 @@ public class DetailActivity extends BaseActivity {
                 currentSeriesGroupView = view;
             }
         });
-        playerFragment.post(new Runnable() {
+        
+        private void onGridViewFocusChange(View view, boolean hasFocus) {
+        if (mPlayerFrameBlock.getVisibility() != View.VISIBLE) return;
+        mPlayerFrameBlock.setFocusable(!hasFocus);
+    }
+        mPlayerFrame.post(new Runnable() {
             @Override
             public void run() {
                 playerFragment.getVodController().enableController(false);
@@ -551,7 +546,7 @@ public class DetailActivity extends BaseActivity {
     private void insertPlayerFragment() {
         FrameLayout tempFrame = new FrameLayout(this);
         tempFrame.setId(DETAIL_PLAYER_FRAME_ID);
-        playerFragment.addView(tempFrame, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        mPlayerFrame.addView(tempFrame, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(DETAIL_PLAYER_FRAME_ID, playerFragment, PlayerFragment.FRAGMENT_TAG)
@@ -715,9 +710,8 @@ public class DetailActivity extends BaseActivity {
 
                         refreshList();
                         jumpToPlay(false, true, null);
-                        llPlayerFragmentContainer.setVisibility(View.VISIBLE);
-                        llPlayerFragmentContainerBlock.setVisibility(View.VISIBLE);
-                        llPlayerFragmentContainerBlock.requestFocus();
+                        mPlayerFrame.setVisibility(View.VISIBLE);
+                        mPlayerFrameBlock.setVisibility(View.VISIBLE);
                         JsonObject updateNotice = new JsonObject();
                         updateNotice.addProperty("type", "detail");
                         updateNotice.addProperty("state", "activated");
@@ -732,8 +726,8 @@ public class DetailActivity extends BaseActivity {
                     }
                 } else {
                     showEmpty();
-                    llPlayerFragmentContainer.setVisibility(View.GONE);
-                    llPlayerFragmentContainerBlock.setVisibility(View.GONE);
+                    mPlayerFrame.setVisibility(View.GONE);
+                    mPlayerFrameBlock.setVisibility(View.GONE);
                 }
             }
         });
@@ -976,7 +970,7 @@ public class DetailActivity extends BaseActivity {
         super.onResume();
         init3rdPlayerButton();
         if(getSupportFragmentManager().findFragmentByTag(PlayerFragment.FRAGMENT_TAG) == null) {
-            playerFragment.removeAllViews();
+            mPlayerFrame.removeAllViews();
             insertPlayerFragment();
         }
         VodController controller = playerFragment.getVodController();
@@ -1106,8 +1100,7 @@ public class DetailActivity extends BaseActivity {
         startActivity(intent);
         super.onBackPressed();
     }
-    
-      // preview
+        // preview
     VodInfo previewVodInfo = null;
     boolean showPreview = Hawk.get(HawkConfig.SHOW_PREVIEW, true);; // true 开启 false 关闭
     boolean fullWindows = false;
@@ -1116,14 +1109,14 @@ public class DetailActivity extends BaseActivity {
 
     void toggleFullPreview() {
         if (windowsPreview == null) {
-            windowsPreview = llPlayerFragmentContainer.getLayoutParams();
+            windowsPreview = mPlayerFrame.getLayoutParams();
         }
         if (windowsFull == null) {
             windowsFull = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         }
         fullWindows = !fullWindows;
-        llPlayerFragmentContainer.setLayoutParams(fullWindows ? windowsFull : windowsPreview);
-        llPlayerFragmentContainerBlock.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
+        mPlayerFrame.setLayoutParams(fullWindows ? windowsFull : windowsPreview);
+        mPlayerFrameBlock.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
         mGridView.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
         mGridViewFlag.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
         mSeriesGroupView.setVisibility(fullWindows ? View.GONE : View.VISIBLE);
@@ -1133,6 +1126,7 @@ public class DetailActivity extends BaseActivity {
         tvSort.setFocusable(!fullWindows);
         tvCollect.setFocusable(!fullWindows);
         tvQuickSearch.setFocusable(!fullWindows);
+        
     }
-    
+
 }
