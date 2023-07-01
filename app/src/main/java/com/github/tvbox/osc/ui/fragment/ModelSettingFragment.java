@@ -74,6 +74,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
     private LinearLayout thirdPartyPlayLayout;
     private TextView tvVersion;
     private TextView tv2kAdapter;
+    private TextView tvVideoPurifyText;
     private TextView tvType;
     private TextView tvRemoteControl;
 
@@ -538,6 +539,30 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.show();
             }
         });
+        findViewById(R.id.llVideoPurify).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<String> options = Arrays.asList(new String[] { "开启", "关闭" });
+                boolean selectedVal = Hawk.get(HawkConfig.VIDEO_PURIFY, true);
+                FastClickCheckUtil.check(view);
+                SelectDialog<String> dialog = new SelectDialog<>(mActivity);
+                dialog.setTip("是否开启净化");
+                dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<String>() {
+                    @Override
+                    public void click(String value, int pos) {
+                        Hawk.put(HawkConfig.VIDEO_PURIFY, pos == 0 ? true : false);;
+                        tvVideoPurifyText.setText(Hawk.get(HawkConfig.VIDEO_PURIFY, true) ? "开启" : "关闭");
+                    }
+
+                    @Override
+                    public String getDisplay(String val) {
+                        return val;
+                    }
+                }, null, options, selectedVal ? 0 : 1);
+                dialog.show();
+            }
+        });
+        
         findViewById(R.id.llRender).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -683,6 +708,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.show();
             }
         });
+        
         findViewById(R.id.llRemoteControl).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
