@@ -396,10 +396,8 @@ public class PlayerFragment  extends BaseLazyFragment {
     }
 
     void playUrl(String url, HashMap<String, String> headers) {
-            if (!Hawk.get(HawkConfig.VIDEO_PURIFY, true)) {
             startPlayUrl(url, headers);
-            return;
-        }
+
         if (!url.contains("://127.0.0.1/") && !url.contains(".m3u8")) {
             startPlayUrl(url, headers);
             return;
