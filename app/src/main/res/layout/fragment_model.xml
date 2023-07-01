@@ -508,7 +508,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="@dimen/vs_5"
                     android:layout_marginRight="@dimen/vs_5"
-                    android:layout_weight="1"
+                    android:layout_weight="477"
                     android:background="@drawable/shape_setting_model_focus"
                     android:focusable="true"
                     android:gravity="center_vertical"
