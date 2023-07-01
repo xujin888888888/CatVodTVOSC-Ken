@@ -551,7 +551,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                     @Override
                     public void click(String value, int pos) {
                         Hawk.put(HawkConfig.VIDEO_PURIFY, pos == 0 ? true : false);;
-                        tvVideoPurifyText.setText(Hawk.get(HawkConfig.VIDEO_PURIFY, true) ? "开启" : "关闭");
+                        tvVideoPurifyText.setText(pos == 0 ? "已打开" : "已关闭");
                     }
 
                     @Override
