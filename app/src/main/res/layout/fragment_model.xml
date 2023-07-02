@@ -614,7 +614,7 @@
                         android:layout_weight="1" />
 
                     <TextView
-                        android:id="@+id/tvVideoPurifyText"
+                        android:id="@+id/tvVideoPurify"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/white"
