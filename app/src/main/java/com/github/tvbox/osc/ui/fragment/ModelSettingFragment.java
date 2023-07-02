@@ -74,7 +74,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
     private LinearLayout thirdPartyPlayLayout;
     private TextView tvVersion;
     private TextView tv2kAdapter;
-    private TextView tvVideoPurifyText;
+    private TextView tvVideoPurify;
     private TextView tvType;
     private TextView tvRemoteControl;
 
@@ -110,7 +110,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvVersion = findViewById(R.id.tvVersion);
         tv2kAdapter = findViewById(R.id.tv2kAdapter);
         tvType = findViewById(R.id.tvType);
-        tvVideoPurifyText = findViewById(R.id.tvVideoPurify);
+        tvVideoPurify= findViewById(R.id.tvVideoPurify);
         tvRemoteControl = findViewById(R.id.tvRemoteControl);
 
         tvMediaCodec.setText(Hawk.get(HawkConfig.IJK_CODEC, ""));
@@ -128,7 +128,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvRender.setText(PlayerHelper.getRenderName(Hawk.get(HawkConfig.PLAY_RENDER, 0)));
         tvVersion.setText(AppUpdate.getCurrentVersionNo());
         tvType.setText(PlayerHelper.getDeviceTypeName(Hawk.get(HawkConfig.TV_TYPE, 0)));
-        tvVideoPurify.setText(Hawk.get(HawkConfig.REMOTE_CONTROL, true) ? "已打开" : "已关闭");
+        tvVideoPurify.setText(Hawk.get(HawkConfig.VIDEO_PURIFY, true) ? "已打开" : "已关闭");
         tvRemoteControl.setText(Hawk.get(HawkConfig.REMOTE_CONTROL, true) ? "已打开" : "已关闭");
 
         findViewById(R.id.llDebug).setOnClickListener(new View.OnClickListener() {
@@ -553,7 +553,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
                     @Override
                     public void click(String value, int pos) {
                         Hawk.put(HawkConfig.VIDEO_PURIFY, pos == 0 ? true : false);; 
-                        tvVideoPurifyText.setText(pos == 0 ? "已打开" : "已关闭");
+                        tvVideoPurify.setText(pos == 0 ? "已打开" : "已关闭");
                     }
 
                     @Override
